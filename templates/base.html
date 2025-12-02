@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,8 +11,13 @@
             integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" 
             crossorigin="anonymous"></script>
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Development only - use build process for production) -->
+    <!-- For production: Replace with compiled CSS file from Tailwind CLI -->
+    {% if DEBUG %}
     <script src="https://cdn.tailwindcss.com"></script>
+    {% else %}
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+    {% endif %}
     
     {% block extra_head %}{% endblock %}
 </head>
@@ -63,4 +69,5 @@
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
+
 

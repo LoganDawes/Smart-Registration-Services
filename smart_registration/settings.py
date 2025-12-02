@@ -31,12 +31,10 @@ def config(key, default=None, cast=None):
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-CHANGE-IN-PRODUCTION' if config('DEBUG', default=False, cast=bool) else None)
-if SECRET_KEY is None:
-    raise ValueError("SECRET_KEY must be set in production environments")
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-CHANGE-IN-PRODUCTION' if DEBUG else None)
+if not DEBUG and SECRET_KEY is None:
+    raise ValueError("SECRET_KEY must be set in production environments (when DEBUG=False)")
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1' if DEBUG else '', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 
