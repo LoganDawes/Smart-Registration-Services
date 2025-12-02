@@ -159,6 +159,6 @@ class CourseSection(models.Model):
     def is_full(self):
         return self.current_enrollment >= self.max_enrollment
     
-    def has_space(self):
-        return self.current_enrollment < self.max_enrollment
+    def available_seats(self):
+        return max(0, self.max_enrollment - self.current_enrollment)
 

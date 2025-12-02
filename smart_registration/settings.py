@@ -22,9 +22,19 @@ def config(key, default=None, cast=None):
     value = os.environ.get(key, default)
     if cast and value is not None:
         if cast == bool:
-            return value in ('True', 'true', '1', 'yes')
+            # Handle various boolean representations
+            if isinstance(value, bool):
+                return value
+            return str(value).lower() in ('true', '1', 'yes', 'on')
         return cast(value)
     return value
+
+
+def parse_hosts(hosts_string):
+    """Parse comma-separated ALLOWED_HOSTS string."""
+    if not hosts_string:
+        return []
+    return [s.strip() for s in hosts_string.split(',') if s.strip()]
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,7 +46,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-CHANGE-IN-PRO
 if not DEBUG and SECRET_KEY is None:
     raise ValueError("SECRET_KEY must be set in production environments (when DEBUG=False)")
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1' if DEBUG else '', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+ALLOWED_HOSTS = parse_hosts(config('ALLOWED_HOSTS', default='localhost,127.0.0.1' if DEBUG else ''))
 
 
 # Application definition
