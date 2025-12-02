@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Hero Section -->
+    <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Smart Registration Services</h1>
+        <p class="text-xl text-gray-600 mb-6">
+            Your comprehensive university course-planning and registration system
+        </p>
+        
+        {% if not user.is_authenticated %}
+            <div class="flex space-x-4">
+                <a href="{% url 'admin:login' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                    Login with CAS
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Course Search -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-blue-600 text-4xl mb-4">📚</div>
+            <h3 class="text-xl font-semibold mb-2">Course Catalog</h3>
+            <p class="text-gray-600">
+                Search and browse comprehensive course information with detailed descriptions, prerequisites, and schedules.
+            </p>
+        </div>
+
+        <!-- Schedule Planning -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-blue-600 text-4xl mb-4">📅</div>
+            <h3 class="text-xl font-semibold mb-2">Schedule Planning</h3>
+            <p class="text-gray-600">
+                Build and visualize your course schedule with automatic conflict detection and schedule optimization.
+            </p>
+        </div>
+
+        <!-- Advisor Collaboration -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-blue-600 text-4xl mb-4">💬</div>
+            <h3 class="text-xl font-semibold mb-2">Advisor Support</h3>
+            <p class="text-gray-600">
+                Collaborate with your advisor through real-time chat, plan reviews, and approval workflows.
+            </p>
+        </div>
+
+        <!-- Registration -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-blue-600 text-4xl mb-4">✍️</div>
+            <h3 class="text-xl font-semibold mb-2">Easy Registration</h3>
+            <p class="text-gray-600">
+                Register for courses with streamlined workflows, advisor approval tracking, and enrollment management.
+            </p>
+        </div>
+
+        <!-- AI Recommendations -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-blue-600 text-4xl mb-4">🤖</div>
+            <h3 class="text-xl font-semibold mb-2">AI Recommendations</h3>
+            <p class="text-gray-600">
+                Get personalized course recommendations based on your degree requirements, interests, and academic history.
+            </p>
+        </div>
+
+        <!-- Notifications -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="text-blue-600 text-4xl mb-4">🔔</div>
+            <h3 class="text-xl font-semibold mb-2">Smart Notifications</h3>
+            <p class="text-gray-600">
+                Stay informed with timely notifications about deadlines, schedule changes, and advisor messages.
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    {% if user.is_authenticated %}
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-6">Quick Overview</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="text-center">
+                <div class="text-3xl font-bold text-blue-600">0</div>
+                <div class="text-gray-600">Active Plans</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-green-600">0</div>
+                <div class="text-gray-600">Enrolled Courses</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-yellow-600">0</div>
+                <div class="text-gray-600">Pending Approvals</div>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-bold text-purple-600">0</div>
+                <div class="text-gray-600">Unread Messages</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
