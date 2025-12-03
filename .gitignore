@@ -65,3 +65,5 @@ package-lock.json
 # Temporary files
 /tmp/
 *.tmp
+logs/
+db.sqlite3
