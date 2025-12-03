@@ -1,62 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto">
+<div class="page-container">
     <!-- Hero Section -->
-    <div class="hero-section bg-white rounded-lg shadow-lg p-8 mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Smart Registration Services</h1>
-        <p class="text-xl text-gray-600 mb-6">
+    <div class="hero-section rounded-lg shadow-lg p-8 mb-12 text-center">
+        <h1 class="text-5xl font-bold mb-4">Welcome to Smart Registration Services</h1>
+        <p class="text-xl text-gray-600">
             Your comprehensive university course-planning and registration system
         </p>
     </div>
 
-    <!-- Features Grid - Only 4 modules -->
-    <div class="features-grid grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Features Grid - Only 4 modules centered -->
+    <div class="features-grid mb-12">
         <!-- Course Catalog -->
-        <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div class="text-4xl mb-4">📚</div>
-            <h3 class="text-xl font-semibold mb-2">Course Catalog</h3>
+        <div class="feature-card">
+            <div>📚</div>
+            <h3>Course Catalog</h3>
         </div>
 
         <!-- Schedule Planning -->
-        <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div class="text-4xl mb-4">📅</div>
-            <h3 class="text-xl font-semibold mb-2">Schedule Planning</h3>
+        <div class="feature-card">
+            <div>📅</div>
+            <h3>Schedule Planning</h3>
         </div>
 
         <!-- Registration -->
-        <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div class="text-4xl mb-4">✍️</div>
-            <h3 class="text-xl font-semibold mb-2">Registration</h3>
+        <div class="feature-card">
+            <div>✍️</div>
+            <h3>Registration</h3>
         </div>
 
         <!-- AI Recommendations -->
-        <div class="feature-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-            <div class="text-4xl mb-4">🤖</div>
-            <h3 class="text-xl font-semibold mb-2">AI Recommendations</h3>
+        <div class="feature-card">
+            <div>🤖</div>
+            <h3>AI Recommendations</h3>
         </div>
     </div>
 
     <!-- Quick Stats -->
     {% if user.is_authenticated %}
-    <div class="bg-white rounded-lg shadow-lg p-8">
-        <h2 class="text-2xl font-bold mb-6">Quick Overview</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="text-center">
-                <div class="text-3xl font-bold text-blue-600">0</div>
-                <div class="text-gray-600">Active Plans</div>
+    <div class="quick-overview-card max-w-5xl mx-auto">
+        <h2 class="text-3xl">Quick Overview</h2>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Active Plans</div>
             </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-green-600">0</div>
-                <div class="text-gray-600">Enrolled Courses</div>
+            <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Enrolled Courses</div>
             </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-yellow-600">0</div>
-                <div class="text-gray-600">Pending Approvals</div>
+            <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Pending Approvals</div>
             </div>
-            <div class="text-center">
-                <div class="text-3xl font-bold text-purple-600">0</div>
-                <div class="text-gray-600">Unread Messages</div>
+            <div class="stat-item">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Unread Messages</div>
             </div>
         </div>
     </div>
