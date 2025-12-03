@@ -87,7 +87,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_cas_ng.middleware.CASMiddleware',
+    # 'django_cas_ng.middleware.CASMiddleware',  # Temporarily disabled - needs URL configuration
+    'authentication.middleware.LoginRequiredMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -292,3 +293,7 @@ LOGGING = {
 # AI Recommendations Service Configuration
 AI_SERVICE_URL = config('AI_SERVICE_URL', default='http://localhost:8001')
 AI_SERVICE_ENABLED = config('AI_SERVICE_ENABLED', default=True, cast=bool)
+
+# Authentication settings
+LOGIN_URL = '/admin/login/'
+LOGIN_REDIRECT_URL = '/'
