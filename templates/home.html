@@ -16,24 +16,28 @@
         <div class="feature-card">
             <div>📚</div>
             <h3>Course Catalog</h3>
+            <p class="feature-description">Look up course catalog details, including course description, enforced prerequisites, special course fees, and other details.</p>
         </div>
 
         <!-- Schedule Planning -->
         <div class="feature-card">
             <div>📅</div>
             <h3>Schedule Planning</h3>
+            <p class="feature-description">Give yourself a head start by building class schedule Plans- When you're ready to register, you'll be able to load these Plans.</p>
         </div>
 
         <!-- Registration -->
         <div class="feature-card">
             <div>✍️</div>
             <h3>Registration</h3>
+            <p class="feature-description">Add or drop classes, search the class schedule, or register from a Plan.</p>
         </div>
 
         <!-- AI Recommendations -->
         <div class="feature-card">
             <div>🤖</div>
             <h3>AI Recommendations</h3>
+            <p class="feature-description">Get recommendations by AI for course plans and registration.</p>
         </div>
     </div>
 
@@ -41,7 +45,7 @@
     {% if user.is_authenticated %}
     <div class="quick-overview-card max-w-5xl mx-auto">
         <h2 class="text-3xl">Quick Overview</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div>
             <div class="stat-item">
                 <div class="stat-value">0</div>
                 <div class="stat-label">Active Plans</div>
