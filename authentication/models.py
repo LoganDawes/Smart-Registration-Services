@@ -8,7 +8,6 @@ class User(AbstractUser):
     Custom User model with role-based permissions for the Smart Registration System.
     Supports three types of users: Students, Advisors, and Registrar staff.
     """
-    
     class Role(models.TextChoices):
         STUDENT = 'STUDENT', _('Student')
         ADVISOR = 'ADVISOR', _('Advisor')
