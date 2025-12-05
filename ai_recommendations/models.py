@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinValueValidator, MaxValueValidator  # Recommended for score validation
+
 from authentication.models import User
 from courses.models import Course
 
