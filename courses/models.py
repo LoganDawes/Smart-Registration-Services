@@ -28,7 +28,8 @@ class Course(models.Model):
     
     department = models.CharField(
         max_length=100,
-        help_text=_('Department offering the course')
+        help_text=_('Department offering the course'),
+        db_index=True  # Added index for faster filtering
     )
     
     level = models.CharField(
@@ -64,9 +65,18 @@ class Course(models.Model):
         verbose_name = _('Course')
         verbose_name_plural = _('Courses')
         ordering = ['course_code']
+        indexes = [
+            models.Index(fields=['department', 'level']),
+        ]
     
     def __str__(self):
         return f"{self.course_code} - {self.title}"
+    
+    def get_course_number(self):
+        """Extract numeric portion from course code (e.g., '101' from 'CS101')"""
+        import re
+        match = re.search(r'\d+', self.course_code)
+        return match.group() if match else ''
 
 
 class CourseSection(models.Model):
@@ -94,11 +104,13 @@ class CourseSection(models.Model):
     
     term = models.CharField(
         max_length=20,
-        help_text=_('Academic term (e.g., Fall 2024, Spring 2025)')
+        help_text=_('Academic term (e.g., Fall, Spring, Summer)'),
+        db_index=True  # Added index for faster filtering
     )
     
     year = models.IntegerField(
-        help_text=_('Academic year')
+        help_text=_('Academic year'),
+        db_index=True  # Added index for faster filtering
     )
     
     instructor = models.ForeignKey(
@@ -152,6 +164,10 @@ class CourseSection(models.Model):
         verbose_name_plural = _('Course Sections')
         unique_together = [['course', 'section_number', 'term', 'year']]
         ordering = ['course__course_code', 'section_number']
+        indexes = [
+            models.Index(fields=['term', 'year']),
+            models.Index(fields=['is_available']),
+        ]
     
     def __str__(self):
         return f"{self.course.course_code}-{self.section_number} ({self.term} {self.year})"
