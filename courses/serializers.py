@@ -7,11 +7,12 @@ class CourseSerializer(serializers.ModelSerializer):
     
     prerequisites = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     prerequisite_details = serializers.SerializerMethodField()
+    course_number = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = [
-            'id', 'course_code', 'title', 'description', 'credits',
+            'id', 'course_code', 'course_number', 'title', 'description', 'credits',
             'department', 'level', 'prerequisites', 'prerequisite_details',
             'is_active', 'created_at', 'updated_at'
         ]
@@ -22,6 +23,9 @@ class CourseSerializer(serializers.ModelSerializer):
             {'id': prereq.id, 'course_code': prereq.course_code, 'title': prereq.title}
             for prereq in obj.prerequisites.all()
         ]
+    
+    def get_course_number(self, obj):
+        return obj.get_course_number()
 
 
 class CourseSectionSerializer(serializers.ModelSerializer):
