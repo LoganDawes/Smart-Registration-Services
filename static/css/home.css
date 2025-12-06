@@ -37,12 +37,17 @@ nav.nav-bar {
 .hero-section {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border-left: 5px solid #Fe5c00;
+    padding-left: 2rem;
 }
 
 .hero-section h1 {
     color: #Fe5c00;
     font-weight: 700;
     letter-spacing: -0.5px;
+}
+
+.hero-section p {
+    padding-left: 0.5rem;
 }
 
 /* Features Grid Container - Center Aligned */
@@ -73,6 +78,10 @@ nav.nav-bar {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     position: relative;
     overflow: hidden;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
 .feature-card::before {

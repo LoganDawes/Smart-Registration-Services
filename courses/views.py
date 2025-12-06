@@ -4,8 +4,17 @@ from rest_framework.response import Response
 from django.db import models as django_models
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
+from django.views.generic import TemplateView
 from .models import Course, CourseSection
 from .serializers import CourseSerializer, CourseSectionSerializer
+
+
+class CourseListView(TemplateView):
+    """Course Catalog page view."""
+    template_name = 'courses/catalog.html'
+
+
+course_catalog = CourseListView.as_view()
 
 
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
