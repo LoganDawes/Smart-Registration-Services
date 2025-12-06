@@ -12,6 +12,21 @@ from .serializers import CourseSerializer, CourseSectionSerializer
 class CourseListView(TemplateView):
     """Course Catalog page view."""
     template_name = 'courses/catalog.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Get all active courses
+        courses = Course.objects.filter(is_active=True).prefetch_related('prerequisites')
+        
+        # Get available departments for filtering
+        departments = Course.objects.filter(is_active=True).values_list('department', flat=True).distinct().order_by('department')
+        
+        context['courses'] = courses
+        context['departments'] = departments
+        context['total_courses'] = courses.count()
+        
+        return context
 
 
 course_catalog = CourseListView.as_view()

@@ -7,15 +7,272 @@
 <div class="hero-section rounded-lg shadow-lg p-8 mb-12">
     <h1 class="text-5xl font-bold mb-4">Course Catalog</h1>
     <p class="text-xl text-gray-600">
-        Look up course catalog details, including course description, enforced prerequisites, special course fees, and other details.
+        Browse and search course catalog details, including descriptions, prerequisites, credits, and more.
     </p>
 </div>
+
 <div class="page-container">
-    <!-- Placeholder Content -->
-    <div class="bg-white rounded-lg shadow-lg p-8">
+    <!-- Search and Filter Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Search Courses</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <!-- Search Box -->
+            <div class="md:col-span-3">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Search by Course Code or Title</label>
+                <input type="text" 
+                       id="searchInput" 
+                       placeholder="e.g., CS101 or Introduction to Computer Science" 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
+            </div>
+            
+            <!-- Department Filter -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Department</label>
+                <select id="departmentFilter" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
+                    <option value="">All Departments</option>
+                    {% for department in departments %}
+                    <option value="{{ department }}">{{ department }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Level Filter -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Course Level</label>
+                <select id="levelFilter" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
+                    <option value="">All Levels</option>
+                    <option value="FRESHMAN">Freshman</option>
+                    <option value="SOPHOMORE">Sophomore</option>
+                    <option value="JUNIOR">Junior</option>
+                    <option value="SENIOR">Senior</option>
+                    <option value="GRADUATE">Graduate</option>
+                </select>
+            </div>
+            
+            <!-- Credits Filter -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Credits</label>
+                <select id="creditsFilter" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
+                    <option value="">All Credits</option>
+                    <option value="1">1 Credit</option>
+                    <option value="2">2 Credits</option>
+                    <option value="3">3 Credits</option>
+                    <option value="4">4 Credits</option>
+                    <option value="5">5+ Credits</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex gap-3">
+            <button id="searchBtn" 
+                    class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+                Search
+            </button>
+            <button id="resetBtn" 
+                    class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                Reset
+            </button>
+        </div>
+    </div>
+    
+    <!-- Course Statistics -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div>
+                <div class="text-4xl font-bold text-orange-600">{{ total_courses }}</div>
+                <div class="text-sm text-gray-600 font-semibold mt-1">Total Courses</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-orange-600">{{ departments|length }}</div>
+                <div class="text-sm text-gray-600 font-semibold mt-1">Departments</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-orange-600" id="filteredCount">{{ total_courses }}</div>
+                <div class="text-sm text-gray-600 font-semibold mt-1">Filtered Results</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Course List -->
+    <div id="courseList" class="space-y-4">
+        {% for course in courses %}
+        <div class="course-item bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow" 
+             data-course-code="{{ course.course_code }}"
+             data-title="{{ course.title|lower }}"
+             data-department="{{ course.department }}"
+             data-level="{{ course.level }}"
+             data-credits="{{ course.credits }}">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <h3 class="text-2xl font-bold text-gray-800">{{ course.course_code }}</h3>
+                        <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full bg-orange-100 text-orange-800">
+                            {{ course.department }}
+                        </span>
+                        <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {{ course.get_level_display }}
+                        </span>
+                    </div>
+                    <h4 class="text-xl text-gray-700 mb-3">{{ course.title }}</h4>
+                    <p class="text-gray-600 mb-4">{{ course.description }}</p>
+                </div>
+                <div class="ml-4 text-right">
+                    <div class="text-3xl font-bold text-orange-600">{{ course.credits }}</div>
+                    <div class="text-sm text-gray-500">Credits</div>
+                </div>
+            </div>
+            
+            <!-- Prerequisites -->
+            {% if course.prerequisites.exists %}
+            <div class="border-t border-gray-200 pt-3 mt-3">
+                <span class="text-sm font-semibold text-gray-700">Prerequisites:</span>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    {% for prereq in course.prerequisites.all %}
+                    <span class="inline-block px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg font-semibold">
+                        {{ prereq.course_code }} - {{ prereq.title }}
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Action Button -->
+            <div class="border-t border-gray-200 pt-3 mt-3">
+                <a href="#" class="inline-block px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+                    View Sections
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="bg-white rounded-lg shadow-lg p-12 text-center">
+            <div class="text-6xl mb-4">📚</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No courses available</h3>
+            <p class="text-gray-600 text-lg">
+                Check back later for course catalog information.
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- No Results Message (hidden by default) -->
+    <div id="noResults" class="hidden bg-white rounded-lg shadow-lg p-12 text-center">
+        <div class="text-6xl mb-4">🔍</div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No courses found</h3>
         <p class="text-gray-600 text-lg">
-            Course catalog functionality coming soon...
+            Try adjusting your search criteria or filters.
         </p>
     </div>
 </div>
+
+{% block extra_scripts %}
+<script>
+    // Client-side filtering functionality
+    const searchInput = document.getElementById('searchInput');
+    const departmentFilter = document.getElementById('departmentFilter');
+    const levelFilter = document.getElementById('levelFilter');
+    const creditsFilter = document.getElementById('creditsFilter');
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const courseItems = document.querySelectorAll('.course-item');
+    const noResults = document.getElementById('noResults');
+    const filteredCount = document.getElementById('filteredCount');
+    
+    function filterCourses() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const department = departmentFilter.value;
+        const level = levelFilter.value;
+        const credits = creditsFilter.value;
+        
+        let visibleCount = 0;
+        
+        courseItems.forEach(item => {
+            const courseCode = item.dataset.courseCode.toLowerCase();
+            const title = item.dataset.title;
+            const courseDept = item.dataset.department;
+            const courseLevel = item.dataset.level;
+            const courseCredits = item.dataset.credits;
+            
+            let show = true;
+            
+            // Search term filter
+            if (searchTerm && !courseCode.includes(searchTerm) && !title.includes(searchTerm)) {
+                show = false;
+            }
+            
+            // Department filter
+            if (department && courseDept !== department) {
+                show = false;
+            }
+            
+            // Level filter
+            if (level && courseLevel !== level) {
+                show = false;
+            }
+            
+            // Credits filter
+            if (credits) {
+                if (credits === '5' && parseInt(courseCredits) < 5) {
+                    show = false;
+                } else if (credits !== '5' && courseCredits !== credits) {
+                    show = false;
+                }
+            }
+            
+            if (show) {
+                item.style.display = 'block';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Update filtered count
+        filteredCount.textContent = visibleCount;
+        
+        // Show/hide no results message
+        if (visibleCount === 0) {
+            noResults.classList.remove('hidden');
+            document.getElementById('courseList').style.display = 'none';
+        } else {
+            noResults.classList.add('hidden');
+            document.getElementById('courseList').style.display = 'block';
+        }
+    }
+    
+    function resetFilters() {
+        searchInput.value = '';
+        departmentFilter.value = '';
+        levelFilter.value = '';
+        creditsFilter.value = '';
+        
+        courseItems.forEach(item => {
+            item.style.display = 'block';
+        });
+        
+        filteredCount.textContent = courseItems.length;
+        noResults.classList.add('hidden');
+        document.getElementById('courseList').style.display = 'block';
+    }
+    
+    // Event listeners
+    searchBtn.addEventListener('click', filterCourses);
+    resetBtn.addEventListener('click', resetFilters);
+    
+    // Allow Enter key to trigger search
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            filterCourses();
+        }
+    });
+    
+    // Auto-filter on dropdown change
+    departmentFilter.addEventListener('change', filterCourses);
+    levelFilter.addEventListener('change', filterCourses);
+    creditsFilter.addEventListener('change', filterCourses);
+</script>
+{% endblock %}
 {% endblock %}
