@@ -36,12 +36,11 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
-    # Module URLs (to be implemented)
-    # path('planning/', include('planning.urls')),
-    # path('registration/', include('registration.urls')),
-    # path('advisor/', include('advisor.urls')),
-    # path('recommendations/', include('ai_recommendations.urls')),
-    # path('notifications/', include('notifications.urls')),
+    # Module URLs
+    path('courses/', include('courses.urls')),
+    path('planning/', include('planning.urls')),
+    path('registration/', include('registration.urls')),
+    path('recommendations/', include('ai_recommendations.urls')),
 ]
 
 # Serve media files in development

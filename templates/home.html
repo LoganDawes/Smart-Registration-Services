@@ -13,32 +13,32 @@
     <!-- Features Grid - Only 4 modules centered -->
     <div class="features-grid mb-12">
         <!-- Course Catalog -->
-        <div class="feature-card">
+        <a href="{% url 'courses:catalog' %}" class="feature-card">
             <div>📚</div>
             <h3>Course Catalog</h3>
             <p class="feature-description">Look up course catalog details, including course description, enforced prerequisites, special course fees, and other details.</p>
-        </div>
+        </a>
 
         <!-- Schedule Planning -->
-        <div class="feature-card">
+        <a href="{% url 'planning:schedule' %}" class="feature-card">
             <div>📅</div>
             <h3>Schedule Planning</h3>
             <p class="feature-description">Give yourself a head start by building class schedule Plans - When you're ready to register, you'll be able to load these Plans.</p>
-        </div>
+        </a>
 
         <!-- Registration -->
-        <div class="feature-card">
+        <a href="{% url 'registration:register' %}" class="feature-card">
             <div>✍️</div>
             <h3>Registration</h3>
             <p class="feature-description">Add or drop classes, search the class schedule, or register from a Plan.</p>
-        </div>
+        </a>
 
         <!-- AI Recommendations -->
-        <div class="feature-card">
+        <a href="{% url 'ai_recommendations:recommendations' %}" class="feature-card">
             <div>🤖</div>
             <h3>AI Recommendations</h3>
             <p class="feature-description">Get recommendations by AI for course plans and registration.</p>
-        </div>
+        </a>
     </div>
 
     <!-- Quick Stats -->
