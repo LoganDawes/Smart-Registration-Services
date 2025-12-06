@@ -24,14 +24,7 @@ nav.nav-bar {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    align-items: center !important;
-}
-
-.nav-container > div > div {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
+    align-items: flex-start !important;
 }
 
 .nav-link {

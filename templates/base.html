@@ -28,34 +28,28 @@
     <!-- Navigation Bar -->
     <nav class="nav-bar shadow-lg">
         <div class="nav-container">
-            <div class="flex justify-between items-start">
-                <!-- Logo and content wrapper -->
-                <div class="flex items-start gap-6">
-                    <!-- Logo on the left -->
-                    <img src="{% static 'img/logo.png' %}" alt="Logo" style="height:87px;width:240px;" class="object-contain flex-shrink-0">
-                    <!-- Title and navigation stacked vertically -->
-                    <div class="flex flex-col gap-2">
-                        <h1 class="text-xl font-bold nav-link">Smart Registration Services</h1>
-                        {% if user.is_authenticated %}
-                            <div class="flex gap-6">
-                                <a href="{% url 'admin:index' %}" class="nav-link">Dashboard</a>
-                                {% if user.is_student %}
-                                    <a href="#" class="nav-link">My Courses</a>
-                                    <a href="#" class="nav-link">Plan Schedule</a>
-                                {% endif %}
-                                {% if user.is_advisor %}
-                                    <a href="#" class="nav-link">Student Plans</a>
-                                    <a href="#" class="nav-link">Messages</a>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <!-- Welcome message and logout on the right -->
-                <div class="flex items-center gap-6">
+            <div class="flex items-start gap-6">
+                <!-- Logo on the left -->
+                <img src="{% static 'img/logo.png' %}" alt="Logo" style="height:87px;width:240px;" class="object-contain flex-shrink-0">
+                <!-- Title, navigation, and user info stacked vertically -->
+                <div class="flex flex-col gap-2">
+                    <h1 class="text-xl font-bold nav-link">Smart Registration Services</h1>
                     {% if user.is_authenticated %}
-                        <span class="nav-link">Welcome, {{ user.get_full_name|default:user.username }}</span>
-                        <a href="{% url 'admin:logout' %}" class="nav-link">Logout</a>
+                        <div class="flex gap-6">
+                            <a href="{% url 'admin:index' %}" class="nav-link">Dashboard</a>
+                            {% if user.is_student %}
+                                <a href="#" class="nav-link">My Courses</a>
+                                <a href="#" class="nav-link">Plan Schedule</a>
+                            {% endif %}
+                            {% if user.is_advisor %}
+                                <a href="#" class="nav-link">Student Plans</a>
+                                <a href="#" class="nav-link">Messages</a>
+                            {% endif %}
+                        </div>
+                        <div class="flex gap-6">
+                            <span class="nav-link">Welcome, {{ user.get_full_name|default:user.username }}</span>
+                            <a href="{% url 'admin:logout' %}" class="nav-link">Logout</a>
+                        </div>
                     {% endif %}
                 </div>
             </div>
