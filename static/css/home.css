@@ -20,6 +20,20 @@ nav.nav-bar {
     padding: 0;
 }
 
+.nav-container > div {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+}
+
+.nav-container > div > div {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+}
+
 .nav-link {
     color: white;
     font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
