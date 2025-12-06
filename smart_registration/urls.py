@@ -41,6 +41,7 @@ urlpatterns = [
     path('planning/', include('planning.urls')),
     path('registration/', include('registration.urls')),
     path('recommendations/', include('ai_recommendations.urls')),
+    path('notifications/', include('notifications.urls')),
 ]
 
 # Serve media files in development
