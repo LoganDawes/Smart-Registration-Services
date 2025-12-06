@@ -11,7 +11,16 @@ nav.nav-bar {
     background: linear-gradient(135deg, #Fe5c00 0%, #e55400 100%);
     box-shadow: 0 4px 6px -1px rgba(254, 92, 0, 0.2);
     width: 100%;
-    padding: 1rem 2rem;
+    padding: 0rem 0rem;
+}
+
+/* Custom logo size */
+.logo-small {
+    width: 163px;
+    height: 85px;
+    max-width: 163px;
+    max-height: 85px;
+    object-fit: contain;
 }
 
 .nav-container {
@@ -24,7 +33,7 @@ nav.nav-bar {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    align-items: flex-start !important;
+    align-items: center !important;
 }
 
 .nav-link {
@@ -45,6 +54,10 @@ nav.nav-bar {
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     border-left: 5px solid #Fe5c00;
     padding-left: 2rem;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    text-align: left !important;
+    max-width: 700px;
 }
 
 .hero-section h1 {
@@ -54,7 +67,7 @@ nav.nav-bar {
 }
 
 .hero-section p {
-    padding-left: 0.5rem;
+    padding-left: 2rem;
 }
 
 /* Features Grid Container - Center Aligned */
@@ -86,7 +99,7 @@ nav.nav-bar {
     position: relative;
     overflow: hidden;
     display: block;
-    text-decoration: none;
+    text-decoration: none !important;
     color: inherit;
     cursor: pointer;
 }
@@ -237,4 +250,25 @@ footer {
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 1rem;
+}
+
+.feature-card,
+.feature-card:link,
+.feature-card:visited,
+.feature-card:hover,
+.feature-card:active {
+    text-decoration: none !important;
+}
+
+/* Remove underline and inherit color for all text inside feature-card links */
+.feature-card h3,
+.feature-card p,
+.feature-card div {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+/* Force left padding on hero-section paragraph, override Tailwind */
+.hero-section > p {
+    padding-left: 2rem !important;
 }
