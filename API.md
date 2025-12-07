@@ -652,3 +652,167 @@ For API questions or issues:
 - Rate limiting
 - API versioning
 - Token authentication
+
+---
+
+## Student Planning API
+
+### Student Plans
+
+#### List My Plans
+```
+GET /api/plans/
+```
+
+Returns plans for the current user based on role:
+- Students: their own plans
+- Advisors: plans assigned to them
+- Registrar: all plans
+
+#### Get Plan Details
+```
+GET /api/plans/{id}/
+```
+
+Returns detailed plan with courses, conflicts, and total credits.
+
+#### Create Plan
+```
+POST /api/plans/
+```
+
+Request Body:
+```json
+{
+  "name": "Fall 2024 Schedule",
+  "term": "Fall",
+  "year": 2024,
+  "notes": "Optional notes"
+}
+```
+
+#### Add Course to Plan
+```
+POST /api/plans/{id}/add_course/
+```
+
+Request Body:
+```json
+{
+  "section_id": 1,
+  "priority": 0,
+  "notes": "Optional notes"
+}
+```
+
+Automatically checks prerequisites and returns error if not met.
+
+#### Remove Course from Plan
+```
+POST /api/plans/{id}/remove_course/
+```
+
+#### Detect Conflicts
+```
+POST /api/plans/{id}/detect_conflicts/
+```
+
+Runs conflict detection and returns all detected conflicts.
+
+#### Submit Plan for Approval
+```
+POST /api/plans/{id}/submit/
+```
+
+Students can submit draft plans for advisor review.
+
+#### Approve/Reject Plan (Advisors Only)
+```
+POST /api/plans/{id}/approve/
+POST /api/plans/{id}/reject/
+```
+
+---
+
+## Registration & Enrollment API
+
+### Enrollment Actions
+
+#### Enroll in Course
+```
+POST /api/registration-actions/enroll/
+```
+
+Request Body:
+```json
+{
+  "section_id": 1
+}
+```
+
+Automatically checks prerequisites, detects conflicts, and enrolls or waitlists based on capacity.
+
+#### Drop Course
+```
+POST /api/registration-actions/drop/
+```
+
+Request Body:
+```json
+{
+  "enrollment_id": 1
+}
+```
+
+#### Check Enrollment Eligibility
+```
+POST /api/registration-actions/check_eligibility/
+```
+
+Returns eligibility status with prerequisites, conflicts, and capacity information.
+
+### Registration Requests
+
+#### Create Registration Request
+```
+POST /api/registration-requests/
+```
+
+Request Body:
+```json
+{
+  "plan": 1,
+  "notes": "Please approve my registration"
+}
+```
+
+#### Approve/Reject Request (Advisors Only)
+```
+POST /api/registration-requests/{id}/approve_reject/
+```
+
+Request Body:
+```json
+{
+  "action": "approve",
+  "advisor_comments": "Optional comments"
+}
+```
+
+---
+
+## Example Workflows
+
+### Student Registration Workflow
+
+1. Search for courses: `GET /api/sections/search_sections/?term=Fall&year=2024`
+2. Check eligibility: `POST /api/registration-actions/check_eligibility/`
+3. Enroll in course: `POST /api/registration-actions/enroll/`
+
+### Plan Creation Workflow
+
+1. Create a plan: `POST /api/plans/`
+2. Add courses: `POST /api/plans/{id}/add_course/`
+3. Check for conflicts: `POST /api/plans/{id}/detect_conflicts/`
+4. Submit for approval: `POST /api/plans/{id}/submit/`
+
