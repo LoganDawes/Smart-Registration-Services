@@ -34,9 +34,13 @@ class RegistrationView(TemplateView):
             ).select_related('section__course').order_by('-enrolled_at')
             
             # Separate by status
-            context['enrolled'] = enrollments.filter(status=Enrollment.Status.ENROLLED)
+            enrolled = enrollments.filter(status=Enrollment.Status.ENROLLED)
+            context['enrolled'] = enrolled
             context['waitlisted'] = enrollments.filter(status=Enrollment.Status.WAITLISTED)
             context['dropped'] = enrollments.filter(status=Enrollment.Status.DROPPED)
+            
+            # Calculate total credits
+            context['total_credits'] = sum(e.section.course.credits for e in enrolled)
             
             # Get pending registration requests
             context['pending_requests'] = RegistrationRequest.objects.filter(

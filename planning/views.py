@@ -39,6 +39,23 @@ class SchedulePlanningView(TemplateView):
                 context['current_plan'] = current_plan
                 context['schedule_data'] = get_schedule_grid_data(current_plan)
                 context['conflicts'] = current_plan.conflicts.all()
+                
+                # Calculate total credits
+                total_credits = sum(
+                    pc.section.course.credits
+                    for pc in current_plan.planned_courses.select_related('section__course').all()
+                )
+                context['total_credits'] = total_credits
+                
+                # Create time slots for schedule grid (8 AM to 10 PM)
+                time_slots = []
+                for hour in range(8, 22):
+                    time_slots.append({
+                        'hour': hour,
+                        'display': f"{hour}:00" if hour <= 12 else f"{hour-12}:00",
+                        'period': 'AM' if hour < 12 else 'PM'
+                    })
+                context['time_slots'] = time_slots
         
         return context
 

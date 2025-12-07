@@ -197,7 +197,7 @@ def check_prerequisites(student, course) -> Tuple[bool, List[str]]:
     # Get all courses the student has completed (with passing grade)
     completed_courses = Enrollment.objects.filter(
         student=student,
-        status='ENROLLED',
+        status=Enrollment.Status.ENROLLED,
         grade__in=['A', 'B', 'C', 'A+', 'A-', 'B+', 'B-', 'C+', 'C-', 'P', 'S']
     ).values_list('section__course', flat=True)
     

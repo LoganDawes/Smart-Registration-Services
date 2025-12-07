@@ -144,15 +144,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for hour in "89ABCDEFGHIJ" %}
+                        {% for slot in time_slots %}
                         <tr>
                             <td class="border border-gray-300 px-4 py-2 text-sm font-medium bg-gray-50">
-                                {{ hour|add:"-8"|add:"8" }}:00
+                                {{ slot.display }} {{ slot.period }}
                             </td>
                             {% for day in schedule_data.days %}
                             <td class="border border-gray-300 px-2 py-2 align-top">
                                 {% for course in schedule_data.schedule|get_item:day %}
-                                {% if course.start_time.hour == hour|add:"-8"|add:"8" %}
+                                {% if course.start_time.hour == slot.hour %}
                                 <div class="bg-orange-100 border-l-4 border-orange-500 p-2 mb-1 text-sm">
                                     <div class="font-bold text-gray-800">{{ course.course_code }}</div>
                                     <div class="text-xs text-gray-600">{{ course.start_time|time:"g:i A" }} - {{ course.end_time|time:"g:i A" }}</div>
@@ -218,8 +218,7 @@
             <!-- Total Credits -->
             <div class="mt-4 p-4 bg-gray-100 rounded-lg">
                 <p class="text-lg font-bold text-gray-800">
-                    Total Credits: 
-                    {% widthratio current_plan.planned_courses.all|length 1 3 %}
+                    Total Credits: {{ total_credits }}
                 </p>
             </div>
             {% else %}
