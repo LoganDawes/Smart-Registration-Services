@@ -31,7 +31,17 @@ class SchedulePlanningView(TemplateView):
             plans = StudentPlan.objects.filter(
                 student=self.request.user
             ).prefetch_related('planned_courses__section__course')
-            context['plans'] = plans
+            
+            # Add credits to each plan
+            plans_with_credits = []
+            for plan in plans:
+                plan.total_credits = sum(
+                    pc.section.course.credits
+                    for pc in plan.planned_courses.select_related('section__course').all()
+                )
+                plans_with_credits.append(plan)
+            
+            context['plans'] = plans_with_credits
             
             # Get current plan (most recent or first plan)
             current_plan = plans.first()

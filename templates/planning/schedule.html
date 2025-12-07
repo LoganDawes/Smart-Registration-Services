@@ -45,7 +45,7 @@
                 <p class="text-sm text-gray-600 mb-2">{{ plan.term }} {{ plan.year }}</p>
                 <p class="text-sm text-gray-600">
                     <strong>Courses:</strong> {{ plan.planned_courses.count }} |
-                    <strong>Credits:</strong> {{ plan.planned_courses.all|length }}
+                    <strong>Credits:</strong> {{ plan.total_credits }}
                 </p>
             </div>
             {% endfor %}
