@@ -144,15 +144,14 @@ class EnrollInSectionSerializer(serializers.Serializer):
     section_id = serializers.IntegerField(required=True)
     
     def validate_section_id(self, value):
-        """Validate that section exists and has capacity."""
+        """Validate that section exists and is available."""
         from courses.models import CourseSection
         
         try:
             section = CourseSection.objects.get(id=value)
             if not section.is_available:
                 raise serializers.ValidationError("This section is not available")
-            if section.is_full():
-                raise serializers.ValidationError("This section is full")
+            # Note: We allow full sections for waitlisting - capacity check is done in the view
             return value
         except CourseSection.DoesNotExist:
             raise serializers.ValidationError("Section does not exist")

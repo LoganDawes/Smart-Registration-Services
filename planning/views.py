@@ -30,7 +30,7 @@ class SchedulePlanningView(TemplateView):
         if self.request.user.is_student():
             plans = StudentPlan.objects.filter(
                 student=self.request.user
-            ).prefetch_related('planned_courses__section__course')
+            ).prefetch_related('planned_courses__section__course').order_by('-created_at')
             
             # Add credits to each plan
             plans_with_credits = []
@@ -43,27 +43,45 @@ class SchedulePlanningView(TemplateView):
             
             context['plans'] = plans_with_credits
             
-            # Get current plan (most recent or first plan)
-            current_plan = plans.first()
+            # Get current plan (from query param or most recent)
+            plan_id = self.request.GET.get('plan_id')
+            if plan_id:
+                current_plan = plans.filter(id=plan_id).first()
+            else:
+                current_plan = plans.first()
+            
             if current_plan:
                 context['current_plan'] = current_plan
                 context['schedule_data'] = get_schedule_grid_data(current_plan)
                 context['conflicts'] = current_plan.conflicts.all()
                 
-                # Calculate total credits
-                total_credits = sum(
+                # Use already calculated total credits if available
+                context['total_credits'] = getattr(current_plan, 'total_credits', sum(
                     pc.section.course.credits
                     for pc in current_plan.planned_courses.select_related('section__course').all()
-                )
-                context['total_credits'] = total_credits
+                ))
                 
                 # Create time slots for schedule grid (8 AM to 10 PM)
                 time_slots = []
                 for hour in range(8, 22):
+                    # Proper 12-hour format conversion
+                    if hour == 0:
+                        display_hour = 12
+                        period = 'AM'
+                    elif hour < 12:
+                        display_hour = hour
+                        period = 'AM'
+                    elif hour == 12:
+                        display_hour = 12
+                        period = 'PM'
+                    else:
+                        display_hour = hour - 12
+                        period = 'PM'
+                    
                     time_slots.append({
                         'hour': hour,
-                        'display': f"{hour}:00" if hour <= 12 else f"{hour-12}:00",
-                        'period': 'AM' if hour < 12 else 'PM'
+                        'display': f"{display_hour}:00",
+                        'period': period
                     })
                 context['time_slots'] = time_slots
         
