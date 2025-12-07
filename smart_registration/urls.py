@@ -13,12 +13,22 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 # Import viewsets and views
 from courses.views import CourseViewSet, CourseSectionViewSet
+from planning.views import StudentPlanViewSet
+from registration.views import (
+    EnrollmentViewSet, RegistrationRequestViewSet,
+    RegistrationActionViewSet, RegistrationLogViewSet
+)
 from authentication.views import home
 
 # Create API router
 router = DefaultRouter()
 router.register(r'courses', CourseViewSet, basename='course')
 router.register(r'sections', CourseSectionViewSet, basename='section')
+router.register(r'plans', StudentPlanViewSet, basename='plan')
+router.register(r'enrollments', EnrollmentViewSet, basename='enrollment')
+router.register(r'registration-requests', RegistrationRequestViewSet, basename='registration-request')
+router.register(r'registration-actions', RegistrationActionViewSet, basename='registration-action')
+router.register(r'registration-logs', RegistrationLogViewSet, basename='registration-log')
 
 urlpatterns = [
     # Home page
