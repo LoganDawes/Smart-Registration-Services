@@ -67,3 +67,6 @@ package-lock.json
 *.tmp
 logs/
 db.sqlite3
+tailwindcss-linux-x64
+tailwind.config.js
+static/css/input.css
