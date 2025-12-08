@@ -20,6 +20,7 @@ class LoginRequiredMiddleware:
         '/accounts/logout/',
         '/static/',
         '/media/',
+        '/api/',  # API endpoints handle their own authentication via DRF
     ]
     
     def __init__(self, get_response):
