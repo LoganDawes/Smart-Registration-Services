@@ -20,6 +20,7 @@ from .serializers import (
 from planning.utils import check_prerequisites, check_schedule_conflict
 from planning.models import StudentPlan
 from courses.models import CourseSection
+from notifications.models import Notification
 
 
 @method_decorator(login_required, name='dispatch')
@@ -732,6 +733,17 @@ def confirm_all_registration(request):
     # Clear added courses on success
     if registered > 0:
         request.session['added_courses'] = []
+        
+        # Create enrollment confirmed notification
+        Notification.objects.create(
+            recipient=request.user,
+            notification_type=Notification.Type.ENROLLMENT_CONFIRMED,
+            title='Enrollment Confirmed',
+            message=f'You have successfully registered for {registered} course(s).',
+            link='/registration/register/',
+            is_sent=True,
+            sent_at=timezone.now()
+        )
     
     return JsonResponse({
         'success': True,
