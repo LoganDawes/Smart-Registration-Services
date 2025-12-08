@@ -106,7 +106,7 @@ class CourseSection(models.Model):
         max_length=10,
         unique=True,
         blank=True,
-        null=True,
+        default='',
         help_text=_('Course Reference Number')
     )
     

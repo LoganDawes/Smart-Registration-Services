@@ -244,16 +244,6 @@
 
 {% block extra_scripts %}
 <script>
-    // Registration cart stored in sessionStorage
-    function getCart() {
-        const cart = sessionStorage.getItem('registrationCart');
-        return cart ? JSON.parse(cart) : [];
-    }
-    
-    function saveCart(cart) {
-        sessionStorage.setItem('registrationCart', JSON.stringify(cart));
-    }
-    
     // Load plan modal
     function loadPlanModal() {
         fetch('/registration/load-plan-form/')

@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.db import transaction
 from django.http import JsonResponse
+import json
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -569,7 +570,6 @@ def add_to_cart(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    import json
     data = json.loads(request.body)
     section_id = data.get('section_id')
     
@@ -596,7 +596,6 @@ def remove_from_cart(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    import json
     data = json.loads(request.body)
     section_id = data.get('section_id')
     
@@ -619,7 +618,6 @@ def confirm_all_registration(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-    import json
     data = json.loads(request.body)
     section_ids = data.get('section_ids', [])
     
