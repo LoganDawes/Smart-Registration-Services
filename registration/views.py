@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.db import transaction
+from django.http import JsonResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -16,13 +17,14 @@ from .serializers import (
     EnrollInSectionSerializer, DropEnrollmentSerializer
 )
 from planning.utils import check_prerequisites, check_schedule_conflict
+from planning.models import StudentPlan
 from courses.models import CourseSection
 
 
 @method_decorator(login_required, name='dispatch')
 class RegistrationView(TemplateView):
     """Registration page view."""
-    template_name = 'registration/register.html'
+    template_name = 'registration/register_new.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -31,7 +33,7 @@ class RegistrationView(TemplateView):
         if self.request.user.is_student():
             enrollments = Enrollment.objects.filter(
                 student=self.request.user
-            ).select_related('section__course').order_by('-enrolled_at')
+            ).select_related('section__course', 'section__instructor').order_by('-enrolled_at')
             
             # Separate by status
             enrolled = enrollments.filter(status=Enrollment.Status.ENROLLED)
@@ -42,11 +44,16 @@ class RegistrationView(TemplateView):
             # Calculate total credits
             context['total_credits'] = sum(e.section.course.credits for e in enrolled)
             
-            # Get pending registration requests
-            context['pending_requests'] = RegistrationRequest.objects.filter(
-                student=self.request.user,
-                status=RegistrationRequest.Status.PENDING
-            )
+            # Get cart items from session
+            cart = self.request.session.get('registration_cart', [])
+            if cart:
+                cart_sections = CourseSection.objects.filter(
+                    id__in=cart,
+                    is_available=True
+                ).select_related('course', 'instructor')
+                context['cart_items'] = cart_sections
+            else:
+                context['cart_items'] = []
         
         return context
 
@@ -503,3 +510,209 @@ class RegistrationLogViewSet(viewsets.ReadOnlyModelViewSet):
             return RegistrationLog.objects.all()
         
         return RegistrationLog.objects.none()
+
+
+@login_required
+def load_plan_form(request):
+    """View to show load plan modal."""
+    # Get user's plans with total credits
+    plans = StudentPlan.objects.filter(
+        student=request.user
+    ).prefetch_related('planned_courses__section__course').order_by('-created_at')
+    
+    # Add total credits to each plan
+    for plan in plans:
+        plan.total_credits = sum(
+            pc.section.course.credits 
+            for pc in plan.planned_courses.all()
+        )
+    
+    return render(request, 'registration/load_plan_modal.html', {
+        'plans': plans
+    })
+
+
+@login_required
+def load_plan_to_cart(request, plan_id):
+    """Load all courses from a plan into the registration cart."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    plan = get_object_or_404(StudentPlan, id=plan_id, student=request.user)
+    
+    # Get all planned courses
+    planned_courses = plan.planned_courses.select_related('section', 'section__course').all()
+    
+    # Get or create cart in session
+    cart = request.session.get('registration_cart', [])
+    
+    # Add sections to cart (avoid duplicates)
+    added = 0
+    for pc in planned_courses:
+        section_id = pc.section.id
+        if section_id not in cart:
+            cart.append(section_id)
+            added += 1
+    
+    request.session['registration_cart'] = cart
+    
+    return JsonResponse({
+        'success': True,
+        'count': added,
+        'total_in_cart': len(cart)
+    })
+
+
+@login_required
+def add_to_cart(request):
+    """Add a course section to the registration cart."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    import json
+    data = json.loads(request.body)
+    section_id = data.get('section_id')
+    
+    if not section_id:
+        return JsonResponse({'error': 'section_id is required'}, status=400)
+    
+    # Verify section exists
+    section = get_object_or_404(CourseSection, id=section_id, is_available=True)
+    
+    # Get or create cart in session
+    cart = request.session.get('registration_cart', [])
+    
+    if section_id not in cart:
+        cart.append(section_id)
+        request.session['registration_cart'] = cart
+        return JsonResponse({'success': True, 'message': 'Course added to cart'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Course already in cart'}, status=400)
+
+
+@login_required
+def remove_from_cart(request):
+    """Remove a course section from the registration cart."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    import json
+    data = json.loads(request.body)
+    section_id = data.get('section_id')
+    
+    if not section_id:
+        return JsonResponse({'error': 'section_id is required'}, status=400)
+    
+    cart = request.session.get('registration_cart', [])
+    
+    if section_id in cart:
+        cart.remove(section_id)
+        request.session['registration_cart'] = cart
+        return JsonResponse({'success': True, 'message': 'Course removed from cart'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Course not in cart'}, status=400)
+
+
+@login_required
+def confirm_all_registration(request):
+    """Register for all courses in the cart."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    import json
+    data = json.loads(request.body)
+    section_ids = data.get('section_ids', [])
+    
+    if not section_ids:
+        return JsonResponse({'error': 'No courses in cart'}, status=400)
+    
+    registered = 0
+    failed = []
+    
+    for section_id in section_ids:
+        try:
+            section = CourseSection.objects.get(id=section_id, is_available=True)
+            
+            # Check if already enrolled
+            if Enrollment.objects.filter(
+                student=request.user,
+                section=section,
+                status=Enrollment.Status.ENROLLED
+            ).exists():
+                failed.append({
+                    'section_id': section_id,
+                    'error': f'Already enrolled in {section.course.course_code}'
+                })
+                continue
+            
+            # Check prerequisites
+            prereqs_met, missing = check_prerequisites(request.user, section.course)
+            if not prereqs_met:
+                failed.append({
+                    'section_id': section_id,
+                    'error': f'{section.course.course_code}: Missing prerequisites'
+                })
+                continue
+            
+            # Check for conflicts
+            current_enrollments = Enrollment.objects.filter(
+                student=request.user,
+                status=Enrollment.Status.ENROLLED,
+                section__term=section.term,
+                section__year=section.year
+            ).select_related('section')
+            
+            has_conflict = False
+            for enrollment in current_enrollments:
+                conflict, description = check_schedule_conflict(
+                    enrollment.section,
+                    section
+                )
+                if conflict:
+                    failed.append({
+                        'section_id': section_id,
+                        'error': f'{section.course.course_code}: {description}'
+                    })
+                    has_conflict = True
+                    break
+            
+            if has_conflict:
+                continue
+            
+            # Enroll or waitlist
+            with transaction.atomic():
+                if section.is_full():
+                    enrollment_status = Enrollment.Status.WAITLISTED
+                else:
+                    enrollment_status = Enrollment.Status.ENROLLED
+                    section.current_enrollment += 1
+                    section.save()
+                
+                Enrollment.objects.create(
+                    student=request.user,
+                    section=section,
+                    status=enrollment_status
+                )
+                
+                registered += 1
+        
+        except CourseSection.DoesNotExist:
+            failed.append({
+                'section_id': section_id,
+                'error': 'Section not found or unavailable'
+            })
+        except Exception as e:
+            failed.append({
+                'section_id': section_id,
+                'error': str(e)
+            })
+    
+    # Clear cart on success
+    if registered > 0:
+        request.session['registration_cart'] = []
+    
+    return JsonResponse({
+        'success': True,
+        'registered': registered,
+        'failed': failed
+    })
