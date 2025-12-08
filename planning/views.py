@@ -21,7 +21,7 @@ from courses.models import CourseSection
 @method_decorator(login_required, name='dispatch')
 class SchedulePlanningView(TemplateView):
     """Schedule Planning page view."""
-    template_name = 'planning/schedule.html'
+    template_name = 'planning/schedule_new.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -338,3 +338,20 @@ class StudentPlanViewSet(viewsets.ModelViewSet):
             StudentPlanDetailSerializer(plan).data,
             status=status.HTTP_200_OK
         )
+
+
+@login_required
+def select_plan_form(request):
+    """View to show plan selector modal."""
+    section_id = request.GET.get('section_id')
+    
+    # Get user's plans (only DRAFT plans can be edited)
+    plans = StudentPlan.objects.filter(
+        student=request.user,
+        status=StudentPlan.Status.DRAFT
+    ).prefetch_related('planned_courses').order_by('-created_at')
+    
+    return render(request, 'planning/select_plan_modal.html', {
+        'plans': plans,
+        'section_id': section_id
+    })
