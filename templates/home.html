@@ -46,19 +46,19 @@
         <h2 class="text-3xl">Quick Overview</h2>
         <div>
             <div class="stat-item">
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ active_plans|default:0 }}</div>
                 <div class="stat-label">Active Plans</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ enrolled_courses|default:0 }}</div>
                 <div class="stat-label">Enrolled Courses</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value">0</div>
                 <div class="stat-label">Pending Approvals</div>
             </div>
-            <a href="{% url 'notifications:notifications' %}" class="stat-item hover:border-orange-500 cursor-pointer">
-                <div class="stat-value">0</div>
+            <a href="{% url 'notifications:notifications' %}" class="stat-item hover:border-orange-500 cursor-pointer" data-testid="unread-messages-box">
+                <div class="stat-value" data-testid="unread-count">{{ unread_notifications|default:0 }}</div>
                 <div class="stat-label">Unread Messages</div>
             </a>
         </div>

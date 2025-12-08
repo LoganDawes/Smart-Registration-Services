@@ -20,6 +20,7 @@ from .serializers import (
 from planning.utils import check_prerequisites, check_schedule_conflict
 from planning.models import StudentPlan
 from courses.models import CourseSection
+from notifications.models import Notification
 
 
 @method_decorator(login_required, name='dispatch')
@@ -45,16 +46,16 @@ class RegistrationView(TemplateView):
             # Calculate total credits
             context['total_credits'] = sum(e.section.course.credits for e in enrolled)
             
-            # Get cart items from session
-            cart = self.request.session.get('registration_cart', [])
-            if cart:
-                cart_sections = CourseSection.objects.filter(
-                    id__in=cart,
+            # Get added courses items from session
+            added_courses = self.request.session.get('added_courses', [])
+            if added_courses:
+                added_courses_sections = CourseSection.objects.filter(
+                    id__in=added_courses,
                     is_available=True
                 ).select_related('course', 'instructor')
-                context['cart_items'] = cart_sections
+                context['added_courses_items'] = added_courses_sections
             else:
-                context['cart_items'] = []
+                context['added_courses_items'] = []
         
         return context
 
@@ -550,8 +551,8 @@ def load_plan_form(request):
 
 
 @login_required
-def load_plan_to_cart(request, plan_id):
-    """Load all courses from a plan into the registration cart."""
+def load_plan_to_added_courses(request, plan_id):
+    """Load all courses from a plan into the added courses list."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -560,29 +561,29 @@ def load_plan_to_cart(request, plan_id):
     # Get all planned courses
     planned_courses = plan.planned_courses.select_related('section', 'section__course').all()
     
-    # Get or create cart in session
-    cart = request.session.get('registration_cart', [])
+    # Get or create added courses list in session
+    added_courses = request.session.get('added_courses', [])
     
-    # Add sections to cart (avoid duplicates)
+    # Add sections to added courses (avoid duplicates)
     added = 0
     for pc in planned_courses:
         section_id = pc.section.id
-        if section_id not in cart:
-            cart.append(section_id)
+        if section_id not in added_courses:
+            added_courses.append(section_id)
             added += 1
     
-    request.session['registration_cart'] = cart
+    request.session['added_courses'] = added_courses
     
     return JsonResponse({
         'success': True,
         'count': added,
-        'total_in_cart': len(cart)
+        'total_in_added_courses': len(added_courses)
     })
 
 
 @login_required
-def add_to_cart(request):
-    """Add a course section to the registration cart."""
+def add_to_added_courses(request):
+    """Add a course section to the added courses list."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -595,20 +596,24 @@ def add_to_cart(request):
     # Verify section exists
     section = get_object_or_404(CourseSection, id=section_id, is_available=True)
     
-    # Get or create cart in session
-    cart = request.session.get('registration_cart', [])
+    # Get or create added courses list in session
+    added_courses = request.session.get('added_courses', [])
     
-    if section_id not in cart:
-        cart.append(section_id)
-        request.session['registration_cart'] = cart
-        return JsonResponse({'success': True, 'message': 'Course added to cart'})
+    if section_id not in added_courses:
+        added_courses.append(section_id)
+        request.session['added_courses'] = added_courses
+        return JsonResponse({
+            'success': True, 
+            'message': 'Course added to Added Courses',
+            'total_count': len(added_courses)
+        })
     else:
-        return JsonResponse({'success': False, 'error': 'Course already in cart'}, status=400)
+        return JsonResponse({'success': False, 'error': 'Course already in Added Courses'}, status=400)
 
 
 @login_required
-def remove_from_cart(request):
-    """Remove a course section from the registration cart."""
+def remove_from_added_courses(request):
+    """Remove a course section from the added courses list."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
@@ -618,14 +623,18 @@ def remove_from_cart(request):
     if not section_id:
         return JsonResponse({'error': 'section_id is required'}, status=400)
     
-    cart = request.session.get('registration_cart', [])
+    added_courses = request.session.get('added_courses', [])
     
-    if section_id in cart:
-        cart.remove(section_id)
-        request.session['registration_cart'] = cart
-        return JsonResponse({'success': True, 'message': 'Course removed from cart'})
+    if section_id in added_courses:
+        added_courses.remove(section_id)
+        request.session['added_courses'] = added_courses
+        return JsonResponse({
+            'success': True, 
+            'message': 'Course removed from Added Courses',
+            'total_count': len(added_courses)
+        })
     else:
-        return JsonResponse({'success': False, 'error': 'Course not in cart'}, status=400)
+        return JsonResponse({'success': False, 'error': 'Course not in Added Courses'}, status=400)
 
 
 @login_required
@@ -721,9 +730,20 @@ def confirm_all_registration(request):
                 'error': str(e)
             })
     
-    # Clear cart on success
+    # Clear added courses on success
     if registered > 0:
-        request.session['registration_cart'] = []
+        request.session['added_courses'] = []
+        
+        # Create enrollment confirmed notification
+        Notification.objects.create(
+            recipient=request.user,
+            notification_type=Notification.Type.ENROLLMENT_CONFIRMED,
+            title='Enrollment Confirmed',
+            message=f'You have successfully registered for {registered} course(s).',
+            link='/registration/register/',
+            is_sent=True,
+            sent_at=timezone.now()
+        )
     
     return JsonResponse({
         'success': True,
