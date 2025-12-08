@@ -58,50 +58,25 @@
         <div id="added-courses-list" class="overflow-x-auto" data-testid="added-courses-list">
             {% if added_courses_items %}
                 {% for item in added_courses_items %}
-                <div class="list-row added-courses-item" data-section-id="{{ item.id }}" data-testid="added-course-item">
+                <div class="course-item flex items-center px-4 py-3 bg-white hover:bg-blue-50 transition-colors border-b border-gray-200 rounded-lg mb-2 added-courses-item" data-section-id="{{ item.id }}" data-testid="added-course-item">
                     <!-- Course Number -->
-                    <div class="list-row-course-code">
-                        {{ item.course.course_code }}
-                    </div>
-                    
+                    <div class="w-24 flex-shrink-0 font-bold text-gray-800">{{ item.course.course_code }}</div>
                     <!-- Title -->
-                    <div class="list-row-title">
-                        <div class="list-row-title-text">{{ item.course.title }}</div>
+                    <div class="flex-1 min-w-0 px-2">
+                        <div class="font-semibold text-gray-800 truncate">{{ item.course.title }}</div>
                     </div>
-                    
                     <!-- Subject -->
-                    <div class="list-row-subject">
-                        <span class="list-row-badge bg-orange-100 text-orange-800">
-                            {{ item.course.department }}
-                        </span>
+                    <div class="w-32 flex-shrink-0 px-2 text-center">
+                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-orange-100 text-orange-800">{{ item.course.department }}</span>
                     </div>
-                    
                     <!-- Credits -->
-                    <div class="list-row-credits text-orange-600">
-                        {{ item.course.credits }}
-                    </div>
-                    
+                    <div class="w-20 flex-shrink-0 text-center font-bold text-orange-600">{{ item.course.credits }}</div>
                     <!-- Instructor -->
-                    <div class="list-row-instructor">
-                        {% if item.instructor %}
-                            {{ item.instructor.get_full_name }}
-                        {% else %}
-                            TBA
-                        {% endif %}
-                    </div>
-                    
+                    <div class="w-40 flex-shrink-0 px-2 text-sm text-gray-700 truncate">{% if item.instructor %}{{ item.instructor.get_full_name }}{% else %}TBA{% endif %}</div>
                     <!-- Action Buttons -->
-                    <div class="list-row-actions">
-                        <button onclick="registerSingle({{ item.id }})"
-                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg"
-                                data-testid="register-single-btn">
-                            Register
-                        </button>
-                        <button onclick="removeFromAddedCourses({{ item.id }})"
-                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg"
-                                data-testid="remove-from-added-courses-btn">
-                            Remove
-                        </button>
+                    <div class="flex gap-2 flex-shrink-0 ml-auto">
+                        <button onclick="registerSingle({{ item.id }})" class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">Register</button>
+                        <button onclick="removeFromAddedCourses({{ item.id }})" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">Remove</button>
                     </div>
                 </div>
                 {% endfor %}
@@ -142,46 +117,25 @@
         
         <div class="overflow-x-auto">
             {% for enrollment in enrolled %}
-            <div class="list-row">
+            <div class="course-item flex items-center px-4 py-3 bg-white hover:bg-blue-50 transition-colors border-b border-gray-200 rounded-lg mb-2">
                 <!-- Course Number -->
-                <div class="list-row-course-code">
-                    {{ enrollment.section.course.course_code }}
-                </div>
-                
+                <div class="w-24 flex-shrink-0 font-bold text-gray-800">{{ enrollment.section.course.course_code }}</div>
                 <!-- Title -->
-                <div class="list-row-title">
-                    <div class="list-row-title-text">{{ enrollment.section.course.title }}</div>
-                    <div class="list-row-subtitle">Section {{ enrollment.section.section_number }} | {{ enrollment.section.term }} {{ enrollment.section.year }}</div>
+                <div class="flex-1 min-w-0 px-2">
+                    <div class="font-semibold text-gray-800 truncate">{{ enrollment.section.course.title }}</div>
+                    <div class="text-xs text-gray-500">Section {{ enrollment.section.section_number }} | {{ enrollment.section.term }} {{ enrollment.section.year }}</div>
                 </div>
-                
                 <!-- Subject -->
-                <div class="list-row-subject">
-                    <span class="list-row-badge bg-green-100 text-green-800">
-                        {{ enrollment.section.course.department }}
-                    </span>
+                <div class="w-32 flex-shrink-0 px-2 text-center">
+                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-green-100 text-green-800">{{ enrollment.section.course.department }}</span>
                 </div>
-                
                 <!-- Credits -->
-                <div class="list-row-credits text-green-600">
-                    {{ enrollment.section.course.credits }}
-                </div>
-                
+                <div class="w-20 flex-shrink-0 text-center font-bold text-green-600">{{ enrollment.section.course.credits }}</div>
                 <!-- Instructor -->
-                <div class="list-row-instructor">
-                    {% if enrollment.section.instructor %}
-                        {{ enrollment.section.instructor.get_full_name }}
-                    {% else %}
-                        TBA
-                    {% endif %}
-                </div>
-                
+                <div class="w-40 flex-shrink-0 px-2 text-sm text-gray-700 truncate">{% if enrollment.section.instructor %}{{ enrollment.section.instructor.get_full_name }}{% else %}TBA{% endif %}</div>
                 <!-- Action Button -->
-                <div class="list-row-actions">
-                    <button 
-                        onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')"
-                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md hover:shadow-lg">
-                        Drop Course
-                    </button>
+                <div class="flex gap-2 flex-shrink-0 ml-auto">
+                    <button onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">Drop</button>
                 </div>
             </div>
             {% endfor %}
@@ -198,46 +152,25 @@
         
         <div class="overflow-x-auto">
             {% for enrollment in waitlisted %}
-            <div class="list-row">
+            <div class="course-item flex items-center px-4 py-3 bg-white hover:bg-blue-50 transition-colors border-b border-gray-200 rounded-lg mb-2">
                 <!-- Course Number -->
-                <div class="list-row-course-code">
-                    {{ enrollment.section.course.course_code }}
-                </div>
-                
+                <div class="w-24 flex-shrink-0 font-bold text-gray-800">{{ enrollment.section.course.course_code }}</div>
                 <!-- Title -->
-                <div class="list-row-title">
-                    <div class="list-row-title-text">{{ enrollment.section.course.title }}</div>
-                    <div class="list-row-subtitle">Section {{ enrollment.section.section_number }}</div>
+                <div class="flex-1 min-w-0 px-2">
+                    <div class="font-semibold text-gray-800 truncate">{{ enrollment.section.course.title }}</div>
+                    <div class="text-xs text-gray-500">Section {{ enrollment.section.section_number }}</div>
                 </div>
-                
                 <!-- Subject -->
-                <div class="list-row-subject">
-                    <span class="list-row-badge bg-yellow-100 text-yellow-800">
-                        {{ enrollment.section.course.department }}
-                    </span>
+                <div class="w-32 flex-shrink-0 px-2 text-center">
+                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-800">{{ enrollment.section.course.department }}</span>
                 </div>
-                
                 <!-- Credits -->
-                <div class="list-row-credits text-yellow-600">
-                    {{ enrollment.section.course.credits }}
-                </div>
-                
+                <div class="w-20 flex-shrink-0 text-center font-bold text-yellow-600">{{ enrollment.section.course.credits }}</div>
                 <!-- Instructor -->
-                <div class="list-row-instructor">
-                    {% if enrollment.section.instructor %}
-                        {{ enrollment.section.instructor.get_full_name }}
-                    {% else %}
-                        TBA
-                    {% endif %}
-                </div>
-                
+                <div class="w-40 flex-shrink-0 px-2 text-sm text-gray-700 truncate">{% if enrollment.section.instructor %}{{ enrollment.section.instructor.get_full_name }}{% else %}TBA{% endif %}</div>
                 <!-- Action Button -->
-                <div class="list-row-actions">
-                    <button 
-                        onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')"
-                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md hover:shadow-lg">
-                        Remove
-                    </button>
+                <div class="flex gap-2 flex-shrink-0 ml-auto">
+                    <button onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold">Remove</button>
                 </div>
             </div>
             {% endfor %}
@@ -324,7 +257,13 @@
                 },
                 body: JSON.stringify({ section_id: sectionId })
             })
-            .then(response => response.json())
+            .then(async response => {
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error('Server error: ' + response.status + '\n' + text);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     location.reload();
@@ -349,7 +288,13 @@
                 },
                 body: JSON.stringify({ section_id: sectionId })
             })
-            .then(response => response.json())
+            .then(async response => {
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error('Server error: ' + response.status + '\n' + text);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.id) {
                     // Silently remove from added courses without confirmation
@@ -361,7 +306,11 @@
                         },
                         body: JSON.stringify({ section_id: sectionId })
                     })
-                    .then(() => {
+                    .then(async response => {
+                        if (!response.ok) {
+                            const text = await response.text();
+                            throw new Error('Server error: ' + response.status + '\n' + text);
+                        }
                         alert('Successfully registered!');
                         location.reload();
                     })
@@ -392,7 +341,6 @@
             const sectionIds = Array.from(addedCoursesItems).map(item => 
                 parseInt(item.dataset.sectionId)
             );
-            
             fetch('/registration/confirm-all/', {
                 method: 'POST',
                 headers: {
@@ -401,7 +349,13 @@
                 },
                 body: JSON.stringify({ section_ids: sectionIds })
             })
-            .then(response => response.json())
+            .then(async response => {
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error('Server error: ' + response.status + '\n' + text);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     alert(`Successfully registered for ${data.registered} course(s)!`);
@@ -448,7 +402,13 @@
             },
             body: JSON.stringify({ enrollment_id: enrollmentId })
         })
-        .then(response => response.json())
+        .then(async response => {
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error('Server error: ' + response.status + '\n' + text);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.message) {
                 alert('Course dropped successfully!');
