@@ -61,6 +61,12 @@ celerybeat.pid
 # Node (if using npm for frontend tools)
 node_modules/
 package-lock.json
+yarn.lock
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
 
 # Temporary files
 /tmp/

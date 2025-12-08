@@ -1,19 +1,24 @@
 {% load static %}
 
 <!-- Plan Selector Modal -->
-<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm" 
+<div class="modal-overlay" 
      id="plan-selector-modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="plan-selector-title"
      onclick="if(event.target === this) closePlanModal()">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4 animate-fadeIn">
-        <div class="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-orange-600 to-orange-500 rounded-t-xl">
-            <h2 class="text-3xl font-bold text-white">Add to Plan</h2>
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2 id="plan-selector-title" class="modal-header-title">Add to Plan</h2>
             <button onclick="closePlanModal()" 
-                    class="text-white hover:text-gray-200 text-4xl font-bold leading-none transition-colors">
+                    class="modal-close-btn"
+                    aria-label="Close modal"
+                    type="button">
                 &times;
             </button>
         </div>
         
-        <div class="p-8">
+        <div class="modal-body">
             <p class="text-gray-700 mb-6 text-lg">Select an existing plan or create a new one:</p>
             
             <!-- Create New Plan Option -->
@@ -106,7 +111,7 @@
             </div>
         </div>
         
-        <div class="sticky bottom-0 flex justify-end gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+        <div class="modal-footer">
             <button onclick="closePlanModal()"
                     class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
                 Cancel
@@ -115,29 +120,37 @@
     </div>
 </div>
 
-<style>
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
+<script>
+    // Store the element that opened the modal for focus restoration
+    let planModalOpener = null;
+    
+    // Set opener when modal is opened
+    if (!window.planModalOpened) {
+        window.planModalOpened = true;
+        planModalOpener = document.activeElement;
+        
+        // Lock body scroll
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
+        document.body.classList.add('modal-open');
     }
     
-    .animate-fadeIn {
-        animation: fadeIn 0.2s ease-out;
-    }
-</style>
-
-<script>
     function closePlanModal() {
+        // Unlock body scroll
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('--scrollbar-width');
+        
         const modal = document.getElementById('plan-selector-modal');
         if (modal) {
             modal.remove();
         }
+        
+        // Restore focus to opener
+        if (planModalOpener && planModalOpener.focus) {
+            planModalOpener.focus();
+        }
+        
+        window.planModalOpened = false;
     }
     
     function createAndAddToPlan() {
@@ -234,6 +247,28 @@
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closePlanModal();
+        }
+    });
+    
+    // Trap focus within modal
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Tab') {
+            const modal = document.getElementById('plan-selector-modal');
+            if (!modal) return;
+            
+            const focusableElements = modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            
+            if (event.shiftKey && document.activeElement === firstElement) {
+                event.preventDefault();
+                lastElement.focus();
+            } else if (!event.shiftKey && document.activeElement === lastElement) {
+                event.preventDefault();
+                firstElement.focus();
+            }
         }
     });
 </script>
