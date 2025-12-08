@@ -50,14 +50,14 @@ nav.nav-bar {
 }
 
 /* Hero Section Styling */
-.hero-section {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    border-left: 5px solid #Fe5c00;
-    padding-left: 2rem;
+html .hero-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    border-left: 5px solid #Fe5c00 !important;
+    padding-left: 2rem !important;
     margin-left: 0 !important;
     margin-right: auto !important;
     text-align: left !important;
-    max-width: 700px;
+    max-width: 700px !important;
 }
 
 .hero-section h1 {
@@ -88,20 +88,20 @@ nav.nav-bar {
 }
 
 /* Feature Card Styling */
-.feature-card {
-    background: #ffffff;
-    border-radius: 16px;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid transparent;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    position: relative;
-    overflow: hidden;
-    display: block;
+html .feature-card {
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    padding: 2.5rem 2rem !important;
+    text-align: center !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    display: block !important;
     text-decoration: none !important;
-    color: inherit;
-    cursor: pointer;
+    color: inherit !important;
+    cursor: pointer !important;
 }
 
 .feature-card::before {
@@ -192,6 +192,15 @@ nav.nav-bar {
 
 .stat-item:hover {
     transform: translateY(-4px);
+/* Add spacing between course catalog list entries */
+html .course-item {
+    margin-bottom: 1rem !important;
+    border-radius: 12px !important;
+    border-bottom: 2px solid #e5e7eb !important; /* light gray separator */
+    padding-bottom: 1rem !important;
+    padding-top: 1rem !important;
+}
+}
     border-color: #Fe5c00;
     box-shadow: 0 8px 16px -4px rgba(254, 92, 0, 0.15);
 }
