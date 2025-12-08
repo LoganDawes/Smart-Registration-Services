@@ -102,6 +102,14 @@ class CourseSection(models.Model):
         help_text=_('Section number (e.g., 001, A01)')
     )
     
+    crn = models.CharField(
+        max_length=10,
+        unique=True,
+        blank=True,
+        default='',
+        help_text=_('Course Reference Number')
+    )
+    
     term = models.CharField(
         max_length=20,
         help_text=_('Academic term (e.g., Fall, Spring, Summer)'),
@@ -137,6 +145,13 @@ class CourseSection(models.Model):
         help_text=_('Room/building location')
     )
     
+    campus = models.CharField(
+        max_length=100,
+        blank=True,
+        default='Main Campus',
+        help_text=_('Campus location')
+    )
+    
     meeting_days = models.CharField(
         max_length=50,
         help_text=_('Days the class meets (e.g., MWF, TTH)')
@@ -153,6 +168,22 @@ class CourseSection(models.Model):
     is_available = models.BooleanField(
         default=True,
         help_text=_('Whether section is available for registration')
+    )
+    
+    restrictions = models.TextField(
+        blank=True,
+        help_text=_('Registration restrictions (e.g., Major only, Junior standing)')
+    )
+    
+    attributes = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text=_('Course attributes (e.g., Writing Intensive, Lab)')
+    )
+    
+    waitlist_capacity = models.IntegerField(
+        default=10,
+        help_text=_('Maximum waitlist size')
     )
     
     created_at = models.DateTimeField(auto_now_add=True)

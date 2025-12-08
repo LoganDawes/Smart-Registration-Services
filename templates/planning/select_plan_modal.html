@@ -1,0 +1,196 @@
+{% load static %}
+
+<!-- Plan Selector Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+     id="plan-selector-modal"
+     onclick="if(event.target === this) this.remove()">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-orange-600">
+            <h2 class="text-2xl font-bold text-white">Add to Plan</h2>
+            <button onclick="document.getElementById('plan-selector-modal').remove()" 
+                    class="text-white hover:text-gray-200 text-3xl font-bold">
+                &times;
+            </button>
+        </div>
+        
+        <div class="p-6">
+            <p class="text-gray-700 mb-4">Select an existing plan or create a new one:</p>
+            
+            <!-- Create New Plan Option -->
+            <div class="mb-6 p-4 border-2 border-dashed border-orange-300 rounded-lg">
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Create New Plan</h3>
+                <form id="new-plan-form" class="space-y-3">
+                    <input type="hidden" name="section_id" value="{{ section_id }}">
+                    <div>
+                        <input type="text" 
+                               id="new-plan-name"
+                               name="plan_name" 
+                               placeholder="Enter plan name (e.g., Fall 2024 Schedule)"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <select name="term" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                            <option value="">Select Term</option>
+                            <option value="Fall">Fall</option>
+                            <option value="Spring">Spring</option>
+                            <option value="Summer">Summer</option>
+                        </select>
+                        <select name="year" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                            <option value="">Select Year</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                    <button type="button"
+                            onclick="createAndAddToPlan()"
+                            class="w-full px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+                        Create Plan and Add Course
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Or Divider -->
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">OR</span>
+                </div>
+            </div>
+            
+            <!-- Existing Plans -->
+            <div>
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Select Existing Plan</h3>
+                {% if plans %}
+                <div class="space-y-2 max-h-64 overflow-y-auto">
+                    {% for plan in plans %}
+                    <div class="p-4 border border-gray-300 rounded-lg hover:border-orange-500 hover:bg-orange-50 cursor-pointer transition-colors"
+                         onclick="addToPlanSelected({{ plan.id }}, {{ section_id }})">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-gray-800">{{ plan.name }}</h4>
+                                <p class="text-sm text-gray-600">{{ plan.term }} {{ plan.year }}</p>
+                                <p class="text-xs text-gray-500">{{ plan.planned_courses.count }} courses | Status: {{ plan.get_status_display }}</p>
+                            </div>
+                            <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full
+                                {% if plan.status == 'DRAFT' %}bg-gray-100 text-gray-800
+                                {% elif plan.status == 'SUBMITTED' %}bg-blue-100 text-blue-800
+                                {% elif plan.status == 'APPROVED' %}bg-green-100 text-green-800
+                                {% elif plan.status == 'REJECTED' %}bg-red-100 text-red-800
+                                {% endif %}">
+                                {{ plan.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-600 text-center py-4">No existing plans. Create one above.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+            <button onclick="document.getElementById('plan-selector-modal').remove()"
+                    class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function createAndAddToPlan() {
+        const form = document.getElementById('new-plan-form');
+        const formData = new FormData(form);
+        const planName = formData.get('plan_name');
+        const term = formData.get('term');
+        const year = formData.get('year');
+        const sectionId = formData.get('section_id');
+        
+        if (!planName || !term || !year) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        // First create the plan
+        fetch('/api/plans/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                name: planName,
+                term: term,
+                year: parseInt(year)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Plan created, now add course to it
+                return addCourseToPlan(data.id, sectionId);
+            } else {
+                throw new Error(data.error || 'Failed to create plan');
+            }
+        })
+        .then(() => {
+            alert('Plan created and course added successfully!');
+            document.getElementById('plan-selector-modal').remove();
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    }
+    
+    function addToPlanSelected(planId, sectionId) {
+        addCourseToPlan(planId, sectionId)
+            .then(() => {
+                alert('Course added to plan successfully!');
+                document.getElementById('plan-selector-modal').remove();
+            })
+            .catch(error => {
+                alert(error.message);
+            });
+    }
+    
+    function addCourseToPlan(planId, sectionId) {
+        return fetch(`/api/plans/${planId}/add_course/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                section_id: sectionId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            return data;
+        });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>

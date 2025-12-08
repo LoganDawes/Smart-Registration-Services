@@ -3,276 +3,443 @@
 {% block title %}Course Catalog - Smart Registration Services{% endblock %}
 
 {% block content %}
-<!-- Hero Section OUTSIDE page-container for left alignment -->
+<!-- Hero Section -->
 <div class="hero-section rounded-lg shadow-lg p-8 mb-12">
     <h1 class="text-5xl font-bold mb-4">Course Catalog</h1>
     <p class="text-xl text-gray-600">
-        Browse and search course catalog details, including descriptions, prerequisites, credits, and more.
+        Browse available course sections. Register directly or add to your plan.
     </p>
 </div>
 
 <div class="page-container">
-    <!-- Search and Filter Section -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Search Courses</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <!-- Search Box -->
-            <div class="md:col-span-3">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Search by Course Code or Title</label>
-                <input type="text" 
-                       id="searchInput" 
-                       placeholder="e.g., CS101 or Introduction to Computer Science" 
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
-            </div>
+    <!-- Search Box with Orange Header -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <!-- Orange Header with Search Fields -->
+        <div class="bg-gradient-to-r from-orange-600 to-orange-500 p-6">
+            <h2 class="text-2xl font-bold text-white mb-4">Search Course Sections</h2>
             
-            <!-- Department Filter -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Department</label>
-                <select id="departmentFilter" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
-                    <option value="">All Departments</option>
-                    {% for department in departments %}
-                    <option value="{{ department }}">{{ department }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <!-- Level Filter -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Course Level</label>
-                <select id="levelFilter" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
-                    <option value="">All Levels</option>
-                    <option value="FRESHMAN">Freshman</option>
-                    <option value="SOPHOMORE">Sophomore</option>
-                    <option value="JUNIOR">Junior</option>
-                    <option value="SENIOR">Senior</option>
-                    <option value="GRADUATE">Graduate</option>
-                </select>
-            </div>
-            
-            <!-- Credits Filter -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Credits</label>
-                <select id="creditsFilter" 
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-transparent">
-                    <option value="">All Credits</option>
-                    <option value="1">1 Credit</option>
-                    <option value="2">2 Credits</option>
-                    <option value="3">3 Credits</option>
-                    <option value="4">4 Credits</option>
-                    <option value="5">5+ Credits</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="flex gap-3">
-            <button id="searchBtn" 
-                    class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-                Search
-            </button>
-            <button id="resetBtn" 
-                    class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
-                Reset
-            </button>
-        </div>
-    </div>
-    
-    <!-- Course Statistics -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-                <div class="text-4xl font-bold text-orange-600">{{ total_courses }}</div>
-                <div class="text-sm text-gray-600 font-semibold mt-1">Total Courses</div>
-            </div>
-            <div>
-                <div class="text-4xl font-bold text-orange-600">{{ departments|length }}</div>
-                <div class="text-sm text-gray-600 font-semibold mt-1">Departments</div>
-            </div>
-            <div>
-                <div class="text-4xl font-bold text-orange-600" id="filteredCount">{{ total_courses }}</div>
-                <div class="text-sm text-gray-600 font-semibold mt-1">Filtered Results</div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Course List -->
-    <div id="courseList" class="space-y-4">
-        {% for course in courses %}
-        <div class="course-item bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow" 
-             data-course-code="{{ course.course_code }}"
-             data-title="{{ course.title|lower }}"
-             data-department="{{ course.department }}"
-             data-level="{{ course.level }}"
-             data-credits="{{ course.credits }}">
-            <div class="flex justify-between items-start mb-3">
-                <div class="flex-1">
-                    <div class="flex items-center gap-3 mb-2">
-                        <h3 class="text-2xl font-bold text-gray-800">{{ course.course_code }}</h3>
-                        <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full bg-orange-100 text-orange-800">
-                            {{ course.department }}
-                        </span>
-                        <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
-                            {{ course.get_level_display }}
-                        </span>
-                    </div>
-                    <h4 class="text-xl text-gray-700 mb-3">{{ course.title }}</h4>
-                    <p class="text-gray-600 mb-4">{{ course.description }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Search Box -->
+                <div class="md:col-span-3">
+                    <input type="text" 
+                           id="searchInput" 
+                           placeholder="Search by course code or title" 
+                           class="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:ring-2 focus:ring-white focus:border-white text-lg">
                 </div>
-                <div class="ml-4 text-right">
-                    <div class="text-3xl font-bold text-orange-600">{{ course.credits }}</div>
-                    <div class="text-sm text-gray-500">Credits</div>
+                
+                <!-- Subject/Department Filter -->
+                <div>
+                    <select id="subjectFilter" 
+                            class="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:ring-2 focus:ring-white focus:border-white">
+                        <option value="">All Subjects</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Term Filter -->
+                <div>
+                    <select id="termFilter" 
+                            class="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:ring-2 focus:ring-white focus:border-white">
+                        <option value="">All Terms</option>
+                        {% for term in terms %}
+                        <option value="{{ term }}">{{ term }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Instructor Filter -->
+                <div>
+                    <input type="text" 
+                           id="instructorFilter" 
+                           placeholder="Instructor name" 
+                           class="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:ring-2 focus:ring-white focus:border-white">
                 </div>
             </div>
             
-            <!-- Prerequisites -->
-            {% if course.prerequisites.exists %}
-            <div class="border-t border-gray-200 pt-3 mt-3">
-                <span class="text-sm font-semibold text-gray-700">Prerequisites:</span>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    {% for prereq in course.prerequisites.all %}
-                    <span class="inline-block px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg font-semibold">
-                        {{ prereq.course_code }} - {{ prereq.title }}
+            <div class="flex gap-3 mt-4">
+                <button id="searchBtn" 
+                        class="px-6 py-2 bg-white text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-semibold">
+                    Search
+                </button>
+                <button id="resetBtn" 
+                        class="px-6 py-2 bg-orange-700 text-white rounded-lg hover:bg-orange-800 transition-colors font-semibold">
+                    Reset
+                </button>
+            </div>
+        </div>
+        
+        <!-- Course List Table -->
+        <div id="courseList" class="overflow-x-auto">
+            {% for section in sections %}
+            <div class="course-item flex items-center px-4 py-3 {% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 transition-colors border-b border-gray-200" 
+                 data-course-code="{{ section.course.course_code }}"
+                 data-title="{{ section.course.title|lower }}"
+                 data-subject="{{ section.course.department }}"
+                 data-term="{{ section.term }}"
+                 data-instructor="{% if section.instructor %}{{ section.instructor.get_full_name|lower }}{% endif %}">
+                
+                <!-- Course Number -->
+                <div class="w-24 flex-shrink-0 font-bold text-gray-800">
+                    {{ section.course.course_code }}
+                </div>
+                
+                <!-- Title -->
+                <div class="flex-1 min-w-0 px-2">
+                    <div class="font-semibold text-gray-800 truncate">{{ section.course.title }}</div>
+                </div>
+                
+                <!-- Subject -->
+                <div class="w-32 flex-shrink-0 px-2 text-center">
+                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-orange-100 text-orange-800">
+                        {{ section.course.department }}
                     </span>
-                    {% endfor %}
+                </div>
+                
+                <!-- Credits -->
+                <div class="w-20 flex-shrink-0 text-center font-bold text-orange-600">
+                    {{ section.course.credits }}
+                </div>
+                
+                <!-- Instructor -->
+                <div class="w-40 flex-shrink-0 px-2 text-sm text-gray-700 truncate">
+                    {% if section.instructor %}
+                        {{ section.instructor.get_full_name }}
+                    {% else %}
+                        TBA
+                    {% endif %}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-2 flex-shrink-0 ml-auto">
+                    <button onclick="showDetails({{ section.id }})"
+                            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-semibold text-sm">
+                        Details
+                    </button>
+                    <button onclick="addToPlan({{ section.id }})"
+                            class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-semibold text-sm">
+                        Add to Plan
+                    </button>
+                    {% if user.is_student %}
+                    <button onclick="registerCourse({{ section.id }})"
+                            class="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors font-semibold text-sm">
+                        Register
+                    </button>
+                    {% endif %}
                 </div>
             </div>
-            {% endif %}
-            
-            <!-- Action Button -->
-            <div class="border-t border-gray-200 pt-3 mt-3">
-                <a href="#" class="inline-block px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-                    View Sections
-                </a>
+            {% empty %}
+            <div class="p-12 text-center">
+                <div class="text-6xl mb-4">📚</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">No sections available</h3>
+                <p class="text-gray-600 text-lg">
+                    Check back later for course sections.
+                </p>
             </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="bg-white rounded-lg shadow-lg p-12 text-center">
-            <div class="text-6xl mb-4">📚</div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-2">No courses available</h3>
+        
+        <!-- No Results Message (hidden by default) -->
+        <div id="noResults" class="hidden p-12 text-center">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">No sections found</h3>
             <p class="text-gray-600 text-lg">
-                Check back later for course catalog information.
+                Try adjusting your search criteria or filters.
             </p>
         </div>
-        {% endfor %}
-    </div>
-    
-    <!-- No Results Message (hidden by default) -->
-    <div id="noResults" class="hidden bg-white rounded-lg shadow-lg p-12 text-center">
-        <div class="text-6xl mb-4">🔍</div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-2">No courses found</h3>
-        <p class="text-gray-600 text-lg">
-            Try adjusting your search criteria or filters.
-        </p>
     </div>
 </div>
+
+<!-- Course Details Modal Container -->
+<div id="modal-container"></div>
+
+<!-- Plan Selector Modal Container -->
+<div id="plan-modal-container"></div>
+
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    // Client-side filtering functionality
+    // Store section data for modals
+    const sectionData = {
+        {% for section in sections %}
+        {{ section.id }}: {
+            courseCode: "{{ section.course.course_code }}",
+            title: "{{ section.course.title }}",
+            section: "{{ section.section_number }}",
+            crn: "{{ section.crn|default:'N/A' }}",
+            term: "{{ section.term }} {{ section.year }}",
+            credits: {{ section.course.credits }},
+            description: "{{ section.course.description|escapejs }}",
+            instructor: "{% if section.instructor %}{{ section.instructor.get_full_name }}{% else %}TBA{% endif %}",
+            campus: "{{ section.campus|default:'Main Campus' }}",
+            location: "{{ section.location }}",
+            meetingDays: "{{ section.meeting_days }}",
+            startTime: "{{ section.start_time|time:'g:i A' }}",
+            endTime: "{{ section.end_time|time:'g:i A' }}",
+            capacity: {{ section.max_enrollment }},
+            enrolled: {{ section.current_enrollment }},
+            waitlistCapacity: {{ section.waitlist_capacity }},
+            prerequisites: [{% for prereq in section.course.prerequisites.all %}"{{ prereq.course_code }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+            restrictions: "{{ section.restrictions|default:'None'|escapejs }}",
+            attributes: "{{ section.attributes|default:'None'|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    };
+
+    // Filtering functionality
     const searchInput = document.getElementById('searchInput');
-    const departmentFilter = document.getElementById('departmentFilter');
-    const levelFilter = document.getElementById('levelFilter');
-    const creditsFilter = document.getElementById('creditsFilter');
+    const subjectFilter = document.getElementById('subjectFilter');
+    const termFilter = document.getElementById('termFilter');
+    const instructorFilter = document.getElementById('instructorFilter');
     const searchBtn = document.getElementById('searchBtn');
     const resetBtn = document.getElementById('resetBtn');
     const courseItems = document.querySelectorAll('.course-item');
     const noResults = document.getElementById('noResults');
-    const filteredCount = document.getElementById('filteredCount');
+    const courseList = document.getElementById('courseList');
     
     function filterCourses() {
         const searchTerm = searchInput.value.toLowerCase();
-        const department = departmentFilter.value;
-        const level = levelFilter.value;
-        const credits = creditsFilter.value;
+        const subject = subjectFilter.value;
+        const term = termFilter.value;
+        const instructor = instructorFilter.value.toLowerCase();
         
         let visibleCount = 0;
         
         courseItems.forEach(item => {
             const courseCode = item.dataset.courseCode.toLowerCase();
             const title = item.dataset.title;
-            const courseDept = item.dataset.department;
-            const courseLevel = item.dataset.level;
-            const courseCredits = item.dataset.credits;
+            const courseSubject = item.dataset.subject;
+            const courseTerm = item.dataset.term;
+            const courseInstructor = item.dataset.instructor;
             
             let show = true;
             
-            // Search term filter
             if (searchTerm && !courseCode.includes(searchTerm) && !title.includes(searchTerm)) {
                 show = false;
             }
             
-            // Department filter
-            if (department && courseDept !== department) {
+            if (subject && courseSubject !== subject) {
                 show = false;
             }
             
-            // Level filter
-            if (level && courseLevel !== level) {
+            if (term && !courseTerm.includes(term)) {
                 show = false;
             }
             
-            // Credits filter
-            if (credits) {
-                if (credits === '5' && parseInt(courseCredits) < 5) {
-                    show = false;
-                } else if (credits !== '5' && courseCredits !== credits) {
-                    show = false;
-                }
+            if (instructor && !courseInstructor.includes(instructor)) {
+                show = false;
             }
             
             if (show) {
-                item.style.display = 'block';
+                item.style.display = 'flex';
                 visibleCount++;
             } else {
                 item.style.display = 'none';
             }
         });
         
-        // Update filtered count
-        filteredCount.textContent = visibleCount;
-        
-        // Show/hide no results message
         if (visibleCount === 0) {
             noResults.classList.remove('hidden');
-            document.getElementById('courseList').style.display = 'none';
+            courseList.classList.add('hidden');
         } else {
             noResults.classList.add('hidden');
-            document.getElementById('courseList').style.display = 'block';
+            courseList.classList.remove('hidden');
         }
     }
     
     function resetFilters() {
         searchInput.value = '';
-        departmentFilter.value = '';
-        levelFilter.value = '';
-        creditsFilter.value = '';
+        subjectFilter.value = '';
+        termFilter.value = '';
+        instructorFilter.value = '';
         
         courseItems.forEach(item => {
-            item.style.display = 'block';
+            item.style.display = 'flex';
         });
         
-        filteredCount.textContent = courseItems.length;
         noResults.classList.add('hidden');
-        document.getElementById('courseList').style.display = 'block';
+        courseList.classList.remove('hidden');
     }
     
-    // Event listeners
     searchBtn.addEventListener('click', filterCourses);
     resetBtn.addEventListener('click', resetFilters);
     
-    // Allow Enter key to trigger search
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             filterCourses();
         }
     });
     
-    // Auto-filter on dropdown change
-    departmentFilter.addEventListener('change', filterCourses);
-    levelFilter.addEventListener('change', filterCourses);
-    creditsFilter.addEventListener('change', filterCourses);
+    subjectFilter.addEventListener('change', filterCourses);
+    termFilter.addEventListener('change', filterCourses);
+    
+    // Show course details modal
+    function showDetails(sectionId) {
+        const section = sectionData[sectionId];
+        if (!section) return;
+        
+        const modal = `
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+                 id="details-modal"
+                 onclick="if(event.target === this) this.remove()">
+                <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-orange-600">
+                        <h2 class="text-2xl font-bold text-white">${section.courseCode} - ${section.title}</h2>
+                        <button onclick="document.getElementById('details-modal').remove()" 
+                                class="text-white hover:text-gray-200 text-3xl font-bold">
+                            &times;
+                        </button>
+                    </div>
+                    
+                    <div class="p-6 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">CRN</label>
+                                <p class="text-gray-800">${section.crn}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Section</label>
+                                <p class="text-gray-800">${section.section}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Term</label>
+                                <p class="text-gray-800">${section.term}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Credit Hours</label>
+                                <p class="text-gray-800">${section.credits}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Instructor</label>
+                                <p class="text-gray-800">${section.instructor}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Campus</label>
+                                <p class="text-gray-800">${section.campus}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                            <p class="text-gray-800">${section.description}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700">Meeting Times</label>
+                            <p class="text-gray-800">${section.meetingDays} ${section.startTime} - ${section.endTime}</p>
+                            <p class="text-sm text-gray-600">Location: ${section.location}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Capacity</label>
+                                <p class="text-gray-800">${section.enrolled} / ${section.capacity} enrolled</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700">Waitlist Capacity</label>
+                                <p class="text-gray-800">${section.waitlistCapacity}</p>
+                            </div>
+                        </div>
+                        
+                        ${section.prerequisites.length > 0 ? `
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Prerequisites</label>
+                            <div class="flex flex-wrap gap-2">
+                                ${section.prerequisites.map(p => `<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">${p}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700">Restrictions</label>
+                            <p class="text-gray-800">${section.restrictions}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700">Attributes</label>
+                            <p class="text-gray-800">${section.attributes}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
+                        <button onclick="document.getElementById('details-modal').remove()"
+                                class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                            Close
+                        </button>
+                        <button onclick="addToPlan(${sectionId}); document.getElementById('details-modal').remove();"
+                                class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                            Add to Plan
+                        </button>
+                        {% if user.is_student %}
+                        <button onclick="registerCourse(${sectionId}); document.getElementById('details-modal').remove();"
+                                class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+                            Register
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('modal-container').innerHTML = modal;
+    }
+    
+    // Add to plan - show plan selector
+    function addToPlan(sectionId) {
+        fetch(`/planning/select-plan-form/?section_id=${sectionId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load plan selector');
+                }
+                return response.text();
+            })
+            .then(html => {
+                document.getElementById('plan-modal-container').innerHTML = html;
+            })
+            .catch(error => {
+                alert('Error loading plan selector: ' + error.message);
+            });
+    }
+    
+    // Register for course - add to registration cart
+    function registerCourse(sectionId) {
+        fetch('/registration/add-to-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ section_id: sectionId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Course added to registration cart. Go to My Courses to confirm registration.');
+                window.location.href = '/registration/register/';
+            } else {
+                alert(data.error || 'Failed to add course');
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 </script>
 {% endblock %}
