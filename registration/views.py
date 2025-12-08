@@ -313,16 +313,17 @@ class RegistrationActionViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Check prerequisites
-        prereqs_met, missing = check_prerequisites(request.user, section.course)
-        if not prereqs_met:
-            return Response(
-                {
-                    'error': 'Prerequisites not met',
-                    'missing_prerequisites': missing
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # REMOVED: Prerequisite validation - users can register for any course
+        # # Check prerequisites
+        # prereqs_met, missing = check_prerequisites(request.user, section.course)
+        # if not prereqs_met:
+        #     return Response(
+        #         {
+        #             'error': 'Prerequisites not met',
+        #             'missing_prerequisites': missing
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
         
         # Check for schedule conflicts
         current_enrollments = Enrollment.objects.filter(
@@ -475,10 +476,11 @@ class RegistrationActionViewSet(viewsets.ViewSet):
         ).exists():
             issues.append('Already enrolled in this section')
         
-        # Check prerequisites
-        prereqs_met, missing = check_prerequisites(request.user, section.course)
-        if not prereqs_met:
-            issues.append(f'Missing prerequisites: {", ".join(missing)}')
+        # REMOVED: Prerequisite validation - users can register for any course
+        # # Check prerequisites
+        # prereqs_met, missing = check_prerequisites(request.user, section.course)
+        # if not prereqs_met:
+        #     issues.append(f'Missing prerequisites: {", ".join(missing)}')
         
         # Check for conflicts
         current_enrollments = Enrollment.objects.filter(
@@ -668,14 +670,15 @@ def confirm_all_registration(request):
                 })
                 continue
             
-            # Check prerequisites
-            prereqs_met, missing = check_prerequisites(request.user, section.course)
-            if not prereqs_met:
-                failed.append({
-                    'section_id': section_id,
-                    'error': f'{section.course.course_code}: Missing prerequisites'
-                })
-                continue
+            # REMOVED: Prerequisite validation - users can register for any course
+            # # Check prerequisites
+            # prereqs_met, missing = check_prerequisites(request.user, section.course)
+            # if not prereqs_met:
+            #     failed.append({
+            #         'section_id': section_id,
+            #         'error': f'{section.course.course_code}: Missing prerequisites'
+            #     })
+            #     continue
             
             # Check for conflicts
             current_enrollments = Enrollment.objects.filter(

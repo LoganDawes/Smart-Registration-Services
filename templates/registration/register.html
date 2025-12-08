@@ -352,8 +352,23 @@
             .then(response => response.json())
             .then(data => {
                 if (data.id) {
-                    alert('Successfully registered! Removing from Added Courses...');
-                    removeFromAddedCourses(sectionId);
+                    // Silently remove from added courses without confirmation
+                    fetch('/registration/remove-from-added-courses/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({ section_id: sectionId })
+                    })
+                    .then(() => {
+                        alert('Successfully registered!');
+                        location.reload();
+                    })
+                    .catch(() => {
+                        alert('Successfully registered!');
+                        location.reload();
+                    });
                 } else {
                     alert(data.error || 'Failed to register');
                 }
