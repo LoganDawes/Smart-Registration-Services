@@ -132,6 +132,7 @@ class Command(BaseCommand):
                 'meeting_days': 'MWF',
                 'start_time': time(9, 0),
                 'end_time': time(10, 0),
+                'crn': '10001',
             },
             {
                 'course': created_courses['CS101'],
@@ -144,6 +145,7 @@ class Command(BaseCommand):
                 'meeting_days': 'TTH',
                 'start_time': time(11, 0),
                 'end_time': time(12, 30),
+                'crn': '10002',
             },
             {
                 'course': created_courses['CS201'],
@@ -156,6 +158,7 @@ class Command(BaseCommand):
                 'meeting_days': 'MWF',
                 'start_time': time(10, 0),
                 'end_time': time(11, 0),
+                'crn': '10003',
             },
             {
                 'course': created_courses['MATH101'],
@@ -168,6 +171,7 @@ class Command(BaseCommand):
                 'meeting_days': 'MWF',
                 'start_time': time(8, 0),
                 'end_time': time(9, 0),
+                'crn': '10004',
             },
             {
                 'course': created_courses['ENG101'],
@@ -180,21 +184,43 @@ class Command(BaseCommand):
                 'meeting_days': 'TTH',
                 'start_time': time(14, 0),
                 'end_time': time(15, 30),
+                'crn': '10005',
             },
         ]
         
         for section_data in sections_data:
-            section, created = CourseSection.objects.get_or_create(
+            lookup_fields = dict(
                 course=section_data['course'],
                 section_number=section_data['section_number'],
                 term=section_data['term'],
                 year=section_data['year'],
-                defaults=section_data
+            )
+            defaults = section_data.copy()
+            # Remove lookup fields from defaults to avoid conflicts
+            for key in ['course', 'section_number', 'term', 'year']:
+                defaults.pop(key, None)
+            section, created = CourseSection.objects.get_or_create(
+                **lookup_fields,
+                defaults=defaults
             )
             if created:
                 self.stdout.write(self.style.SUCCESS(
-                    f'Created section: {section.course.course_code}-{section.section_number}'
+                    f'Created section: {section.course.course_code}-{section.section_number} (CRN: {section.crn})'
                 ))
+            else:
+                # Update the existing section with new data
+                updated = False
+                for key, value in defaults.items():
+                    if hasattr(section, key) and getattr(section, key) != value:
+                        setattr(section, key, value)
+                        updated = True
+                if updated:
+                    section.save()
+                    self.stdout.write(self.style.WARNING(
+                        f'Updated existing section: {section.course.course_code}-{section.section_number} (CRN: {section.crn})'
+                    ))
+                else:
+                    self.stdout.write(f'Section already exists and is up to date: {section.course.course_code}-{section.section_number} (CRN: {section.crn})')
         
         self.stdout.write(self.style.SUCCESS('\nSample data created successfully!'))
         self.stdout.write('You can now:')
