@@ -9,13 +9,21 @@ Smart Registration Services is a modern web application that streamlines the cou
 ## Team
 
 Logan Dawes
+
 Shay Philips
+
 Adelyn Jones
+
 Justice Brown
+
 Elijah Yanez
+
 Gannon DeHollander
+
 Charan Teja Uppu
+
 Clayton Nunley
+
 
 ## Architecture
 
