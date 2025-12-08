@@ -20,13 +20,13 @@ from courses.models import CourseSection
 
 @method_decorator(login_required, name='dispatch')
 class SchedulePlanningView(TemplateView):
-    """Schedule page view - displays registered courses in calendar format."""
+    """Schedule page view - displays registered courses and added courses in calendar format."""
     template_name = 'planning/schedule.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get student's enrolled courses only (not plans)
+        # Get student's enrolled courses and added courses
         if self.request.user.is_student():
             from registration.models import Enrollment
             from .utils import parse_meeting_days
@@ -43,10 +43,21 @@ class SchedulePlanningView(TemplateView):
             total_credits = sum(e.section.course.credits for e in enrollments)
             context['total_credits'] = total_credits
             
+            # Get added courses from session
+            added_courses_ids = self.request.session.get('added_courses', [])
+            added_courses_sections = []
+            if added_courses_ids:
+                added_courses_sections = CourseSection.objects.filter(
+                    id__in=added_courses_ids,
+                    is_available=True
+                ).select_related('course', 'instructor')
+            context['added_courses_sections'] = added_courses_sections
+            
             # Generate schedule grid data for calendar view
             days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
             schedule = {day: [] for day in days}
             
+            # Add enrolled courses to schedule
             for enrollment in enrollments:
                 section = enrollment.section
                 meeting_days = parse_meeting_days(section.meeting_days)
@@ -62,7 +73,27 @@ class SchedulePlanningView(TemplateView):
                             'location': section.location,
                             'instructor': section.instructor.get_full_name() if section.instructor else 'TBA',
                             'credits': section.course.credits,
-                            'enrollment_id': enrollment.id
+                            'enrollment_id': enrollment.id,
+                            'status': 'registered'
+                        })
+            
+            # Add added courses to schedule
+            for section in added_courses_sections:
+                meeting_days = parse_meeting_days(section.meeting_days)
+                
+                for day in meeting_days:
+                    if day in schedule:
+                        schedule[day].append({
+                            'course_code': section.course.course_code,
+                            'course_title': section.course.title,
+                            'section_number': section.section_number,
+                            'start_time': section.start_time,
+                            'end_time': section.end_time,
+                            'location': section.location,
+                            'instructor': section.instructor.get_full_name() if section.instructor else 'TBA',
+                            'credits': section.course.credits,
+                            'section_id': section.id,
+                            'status': 'added'
                         })
             
             # Sort courses by start time for each day
@@ -74,7 +105,7 @@ class SchedulePlanningView(TemplateView):
                 'schedule': schedule
             }
             
-            # Create time slots for schedule grid (7 AM to 10 PM)
+            # Create time slots for schedule grid (7 AM - 10 PM)
             time_slots = []
             for hour in range(7, 22):
                 # Proper 12-hour format conversion

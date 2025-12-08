@@ -9,7 +9,7 @@
      onclick="if(event.target === this) closeLoadPlanModal()">
     <div class="modal-container">
         <div class="modal-header bg-gradient-to-r from-green-600 to-green-500">
-            <h2 id="load-plan-title" class="modal-header-title">Load Plan to Cart</h2>
+            <h2 id="load-plan-title" class="modal-header-title">Load Plan to Added Courses</h2>
             <button onclick="closeLoadPlanModal()" 
                     class="modal-close-btn"
                     aria-label="Close modal"
@@ -19,7 +19,7 @@
         </div>
         
         <div class="modal-body">
-            <p class="text-gray-700 mb-6 text-lg">Select a plan to load all its courses into your registration cart:</p>
+            <p class="text-gray-700 mb-6 text-lg">Select a plan to load all its courses into your Added Courses list:</p>
             
             {% if plans %}
             <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
@@ -124,7 +124,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(`Loaded ${data.count} course(s) from plan to your registration cart!`);
+                alert(`Loaded ${data.count} course(s) from plan to your Added Courses list!`);
                 closeLoadPlanModal();
                 location.reload();
             } else {

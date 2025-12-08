@@ -115,16 +115,18 @@
             </div>
             
             <!-- Prerequisites -->
-            {% if section.course.prerequisites.all %}
-            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-6">
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-6" data-testid="prerequisites-section">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Prerequisites</h3>
-                <ul class="list-disc list-inside space-y-1">
+                {% if section.course.prerequisites.all %}
+                <ul class="list-disc list-inside space-y-1" data-testid="prerequisites-list">
                     {% for prereq in section.course.prerequisites.all %}
                     <li class="text-gray-700">{{ prereq.course_code }} - {{ prereq.title }}</li>
                     {% endfor %}
                 </ul>
+                {% else %}
+                <p class="text-gray-700" data-testid="no-prerequisites">None</p>
+                {% endif %}
             </div>
-            {% endif %}
             
             <!-- Restrictions -->
             {% if section.restrictions %}
@@ -138,16 +140,21 @@
         <!-- Footer Actions -->
         <div class="modal-footer">
             <button onclick="closeCourseDetailsModal()"
-                    class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                    class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                    data-testid="close-modal-btn">
                 Close
             </button>
             <button onclick="addToPlan({{ section.id }})"
-                    class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                    class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                    data-testid="add-to-plan-btn">
                 <span class="mr-2">📋</span> Add to Plan
             </button>
-            <button onclick="addToCart({{ section.id }})"
-                    class="px-8 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-                <span class="mr-2">🛒</span> Add to Cart
+            <button onclick="addToAddedCourses({{ section.id }})"
+                    id="add-to-added-courses-btn-{{ section.id }}"
+                    class="px-8 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold"
+                    data-testid="add-to-added-courses-btn"
+                    aria-label="Add to Added Courses">
+                <span class="mr-2">📚</span> Add to Added Courses
             </button>
         </div>
     </div>
@@ -208,8 +215,10 @@
             });
     }
     
-    function addToCart(sectionId) {
-        fetch('/registration/add-to-cart/', {
+    function addToAddedCourses(sectionId) {
+        const btn = document.getElementById(`add-to-added-courses-btn-${sectionId}`);
+        
+        fetch('/registration/add-to-added-courses/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -220,10 +229,27 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Course added to cart successfully!');
-                closeCourseDetailsModal();
+                // Show success message
+                alert('Course added to Added Courses successfully!');
+                
+                // Disable the button and update text
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.innerHTML = '<span class="mr-2">✓</span> Added to Added Courses';
+                }
+                
+                // Update badge count if exists
+                const badge = document.getElementById('added-courses-badge');
+                if (badge && data.total_count) {
+                    badge.textContent = data.total_count;
+                    badge.classList.remove('hidden');
+                }
+                
+                // Close modal after a short delay
+                setTimeout(() => closeCourseDetailsModal(), 1000);
             } else {
-                alert(data.error || 'Failed to add course to cart');
+                alert(data.error || 'Failed to add course to Added Courses');
             }
         })
         .catch(error => {

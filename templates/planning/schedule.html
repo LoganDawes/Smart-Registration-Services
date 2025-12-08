@@ -19,23 +19,39 @@
         <div class="flex justify-between items-center">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800">Course Summary</h2>
-                <p class="text-gray-600 mt-2">Total Enrolled Courses: <span class="font-bold text-orange-600">{{ enrollments|length }}</span></p>
-                <p class="text-gray-600">Total Credits: <span class="font-bold text-orange-600">{{ total_credits }}</span></p>
+                <p class="text-gray-600 mt-2">
+                    <span class="font-bold text-green-600">{{ enrollments|length }}</span> Registered Courses
+                    {% if added_courses_sections %}
+                    | <span class="font-bold text-blue-600">{{ added_courses_sections|length }}</span> Added Courses
+                    {% endif %}
+                </p>
+                <p class="text-gray-600">Total Credits (Registered): <span class="font-bold text-orange-600">{{ total_credits }}</span></p>
             </div>
             <div class="flex gap-3">
-                <a href="{% url 'registration:register' %}" 
-                   class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-                    View All Courses
-                </a>
                 <a href="{% url 'courses:catalog' %}" 
-                   class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                    Browse Catalog
+                   class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                   data-testid="browse-course-catalog-btn">
+                    Browse Course Catalog
                 </a>
             </div>
         </div>
     </div>
     
-    {% if enrollments %}
+    <!-- Legend -->
+    <div class="bg-white rounded-lg shadow-lg p-4 mb-6" data-testid="schedule-legend">
+        <div class="flex items-center gap-6 flex-wrap">
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded bg-gradient-to-br from-green-500 to-green-600"></div>
+                <span class="text-sm font-semibold text-gray-700">Registered Courses</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded bg-gradient-to-br from-blue-500 to-blue-600"></div>
+                <span class="text-sm font-semibold text-gray-700">Added Courses</span>
+            </div>
+        </div>
+    </div>
+    
+    {% if enrollments or added_courses_sections %}
     <!-- Weekly Schedule Calendar -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
         <h3 class="text-2xl font-bold text-gray-800 mb-6">Weekly Schedule</h3>
@@ -66,7 +82,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.MON %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
@@ -81,7 +100,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.TUE %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
@@ -96,7 +118,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.WED %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
@@ -111,7 +136,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.THU %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
@@ -126,7 +154,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.FRI %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
@@ -141,7 +172,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.SAT %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
@@ -156,7 +190,10 @@
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.SUN %}
                                 {% if course.start_time.hour == time_slot.hour %}
-                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                <div class="{% if course.status == 'registered' %}bg-gradient-to-br from-green-500 to-green-600 event--registered{% else %}bg-gradient-to-br from-blue-500 to-blue-600 event--added{% endif %} text-white p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                                     data-testid="schedule-event"
+                                     data-status="{{ course.status }}"
+                                     title="{{ course.course_code }} - {{ course.course_title }}&#10;Section: {{ course.section_number }}&#10;{{ course.start_time|time:'g:i A' }} - {{ course.end_time|time:'g:i A' }}&#10;{{ course.location }}&#10;{{ course.instructor }}&#10;Status: {{ course.status|title }}">
                                     <div class="font-bold text-sm">{{ course.course_code }}</div>
                                     <div class="text-xs mt-1">{{ course.location }}</div>
                                     <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>

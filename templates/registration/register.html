@@ -7,7 +7,7 @@
 <div class="hero-section rounded-lg shadow-lg p-8 mb-12">
     <h1 class="text-5xl font-bold mb-4">Course Registration</h1>
     <p class="text-xl text-gray-600">
-        Add courses to your cart and confirm registration. Load courses from your plans or add them from the catalog.
+        Add courses to your Added Courses list and confirm registration. Load courses from your plans or add them from the catalog.
     </p>
 </div>
 
@@ -19,46 +19,46 @@
         <h2 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
         <div class="flex gap-4 flex-wrap">
             <a href="{% url 'courses:catalog' %}" 
-               class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+               class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+               data-testid="browse-course-catalog-btn">
                 <span class="text-2xl mr-2">📚</span> Browse Course Catalog
             </a>
             <button 
                 onclick="loadPlanModal()"
-                class="px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-700 hover:to-green-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                class="px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-700 hover:to-green-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                data-testid="load-plan-btn">
                 <span class="text-2xl mr-2">📋</span> Load Plan
             </button>
-            <button 
-                onclick="openCreatePlanModal()"
-                class="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-700 hover:to-purple-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                <span class="text-2xl mr-2">➕</span> Create a Plan
-            </button>
             <a href="{% url 'planning:schedule' %}" 
-               class="px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-xl hover:from-orange-700 hover:to-orange-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+               class="px-8 py-4 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-xl hover:from-orange-700 hover:to-orange-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+               data-testid="view-schedule-btn">
                 <span class="text-2xl mr-2">📅</span> View My Schedule
             </a>
         </div>
     </div>
     
-    <!-- Registration Cart -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+    <!-- Added Courses -->
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8" data-testid="added-courses-section">
         <!-- Orange Header -->
         <div class="bg-gradient-to-r from-orange-600 to-orange-500 p-8">
             <div class="flex justify-between items-center">
-                <h2 class="text-3xl font-bold text-white">Registration Cart</h2>
+                <h2 class="text-3xl font-bold text-white" data-testid="added-courses-heading">Added Courses</h2>
                 <button 
                     onclick="confirmRegistration()"
                     id="confirm-btn"
-                    class="px-8 py-4 bg-white text-orange-600 rounded-xl hover:bg-orange-50 transition-all font-bold text-lg shadow-md hover:shadow-lg">
+                    class="px-8 py-4 bg-white text-orange-600 rounded-xl hover:bg-orange-50 transition-all font-bold text-lg shadow-md hover:shadow-lg"
+                    data-testid="confirm-registration-btn"
+                    aria-label="Confirm registration for all added courses">
                     Confirm Registration
                 </button>
             </div>
         </div>
         
-        <!-- Cart Items Table -->
-        <div id="cart-list" class="overflow-x-auto">
-            {% if cart_items %}
-                {% for item in cart_items %}
-                <div class="list-row cart-item" data-section-id="{{ item.id }}">
+        <!-- Added Courses Items Table -->
+        <div id="added-courses-list" class="overflow-x-auto" data-testid="added-courses-list">
+            {% if added_courses_items %}
+                {% for item in added_courses_items %}
+                <div class="list-row added-courses-item" data-section-id="{{ item.id }}" data-testid="added-course-item">
                     <!-- Course Number -->
                     <div class="list-row-course-code">
                         {{ item.course.course_code }}
@@ -93,20 +93,22 @@
                     <!-- Action Buttons -->
                     <div class="list-row-actions">
                         <button onclick="registerSingle({{ item.id }})"
-                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg">
+                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg"
+                                data-testid="register-single-btn">
                             Register
                         </button>
-                        <button onclick="removeFromCart({{ item.id }})"
-                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg">
+                        <button onclick="removeFromAddedCourses({{ item.id }})"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg"
+                                data-testid="remove-from-added-courses-btn">
                             Remove
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-            <div id="empty-cart" class="p-16 text-center bg-gray-50">
-                <div class="text-7xl mb-6">🛒</div>
-                <h3 class="text-3xl font-bold text-gray-800 mb-4">Your Cart is Empty</h3>
+            <div id="empty-added-courses" class="p-16 text-center bg-gray-50" data-testid="empty-added-courses">
+                <div class="text-7xl mb-6">📚</div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-4">Your Added Courses List is Empty</h3>
                 <p class="text-gray-600 text-xl mb-8">
                     Add courses from the catalog or load a plan to get started.
                 </p>
@@ -311,10 +313,10 @@
         document.body.style.removeProperty('--scrollbar-width');
     }
     
-    // Remove from cart
-    function removeFromCart(sectionId) {
-        if (confirm('Remove this course from your registration cart?')) {
-            fetch('/registration/remove-from-cart/', {
+    // Remove from Added Courses
+    function removeFromAddedCourses(sectionId) {
+        if (confirm('Remove this course from your Added Courses list?')) {
+            fetch('/registration/remove-from-added-courses/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -350,8 +352,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.id) {
-                    alert('Successfully registered! Removing from cart...');
-                    removeFromCart(sectionId);
+                    alert('Successfully registered! Removing from Added Courses...');
+                    removeFromAddedCourses(sectionId);
                 } else {
                     alert(data.error || 'Failed to register');
                 }
@@ -362,16 +364,16 @@
         }
     }
     
-    // Confirm registration for all courses in cart
+    // Confirm registration for all courses in Added Courses
     function confirmRegistration() {
-        const cartItems = document.querySelectorAll('.cart-item');
-        if (cartItems.length === 0) {
-            alert('Your cart is empty. Add courses before confirming registration.');
+        const addedCoursesItems = document.querySelectorAll('.added-courses-item');
+        if (addedCoursesItems.length === 0) {
+            alert('Your Added Courses list is empty. Add courses before confirming registration.');
             return;
         }
         
-        if (confirm(`Register for all ${cartItems.length} courses in your cart?`)) {
-            const sectionIds = Array.from(cartItems).map(item => 
+        if (confirm(`Register for all ${addedCoursesItems.length} courses in your Added Courses list?`)) {
+            const sectionIds = Array.from(addedCoursesItems).map(item => 
                 parseInt(item.dataset.sectionId)
             );
             
