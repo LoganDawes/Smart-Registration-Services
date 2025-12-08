@@ -82,7 +82,7 @@ python manage.py createsuperuser
 
 7. **Populate sample data (optional):**
 ```bash
-python manage.py populate_sample_data
+python manage.py create_large_sample_data --clear
 ```
 
 8. **Run development server:**
