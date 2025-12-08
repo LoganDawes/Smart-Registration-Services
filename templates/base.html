@@ -34,7 +34,7 @@
                             <a href="{% url 'home' %}" class="nav-link">Dashboard  |</a>
                             {% if user.is_student %}
                                 <a href="{% url 'registration:register' %}" class="nav-link">My Courses  |</a>
-                                <a href="{% url 'planning:schedule' %}" class="nav-link">Plan Schedule</a>
+                                <a href="{% url 'planning:schedule' %}" class="nav-link">My Schedule</a>
                             {% endif %}
                             {% if user.is_advisor %}
                                 <a href="#" class="nav-link">Student Plans  |</a>

@@ -1,14 +1,14 @@
 {% load static %}
 
 <!-- Create Plan Modal -->
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm" 
      id="create-plan-modal"
-     onclick="if(event.target === this) this.remove()">
-    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl">
-        <div class="flex justify-between items-center p-6 border-b border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-800">Create New Plan</h2>
-            <button onclick="document.getElementById('create-plan-modal').remove()" 
-                    class="text-gray-500 hover:text-gray-700 text-3xl font-bold">
+     onclick="if(event.target === this) closeCreatePlanModal()">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl m-4 animate-fadeIn">
+        <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-orange-600 to-orange-500 rounded-t-xl">
+            <h2 class="text-3xl font-bold text-white">Create New Plan</h2>
+            <button onclick="closeCreatePlanModal()" 
+                    class="text-white hover:text-gray-200 text-4xl font-bold leading-none transition-colors">
                 &times;
             </button>
         </div>
@@ -16,23 +16,23 @@
         <form hx-post="/api/plans/" 
               hx-target="#create-plan-modal"
               hx-swap="outerHTML"
-              class="p-6">
-            <div class="space-y-4">
+              class="p-8">
+            <div class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Plan Name</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Plan Name</label>
                     <input type="text" 
                            name="name" 
                            required
                            placeholder="e.g., Fall 2024 Schedule"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                           class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600 transition-colors">
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Term</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Term</label>
                         <select name="term" 
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600 transition-colors">
                             <option value="">Select Term</option>
                             <option value="Fall">Fall</option>
                             <option value="Spring">Spring</option>
@@ -41,10 +41,10 @@
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Year</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Year</label>
                         <select name="year" 
                                 required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
+                                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600 transition-colors">
                             <option value="">Select Year</option>
                             <option value="2024">2024</option>
                             <option value="2025">2025</option>
@@ -54,22 +54,22 @@
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Notes (Optional)</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Notes (Optional)</label>
                     <textarea name="notes" 
-                              rows="3"
+                              rows="4"
                               placeholder="Add any notes about this plan..."
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600"></textarea>
+                              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600 focus:border-orange-600 transition-colors"></textarea>
                 </div>
             </div>
             
-            <div class="flex justify-end gap-3 mt-6">
+            <div class="flex justify-end gap-4 mt-8">
                 <button type="button" 
-                        onclick="document.getElementById('create-plan-modal').remove()"
-                        class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                        onclick="closeCreatePlanModal()"
+                        class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
                     Cancel
                 </button>
                 <button type="submit"
-                        class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+                        class="px-8 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold shadow-md hover:shadow-lg">
                     Create Plan
                 </button>
             </div>
@@ -77,10 +77,41 @@
     </div>
 </div>
 
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .animate-fadeIn {
+        animation: fadeIn 0.2s ease-out;
+    }
+</style>
+
 <script>
+    function closeCreatePlanModal() {
+        const modal = document.getElementById('create-plan-modal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
     document.body.addEventListener('htmx:afterSwap', function(event) {
         if (event.detail.target.id === 'create-plan-modal') {
             setTimeout(() => location.reload(), 500);
+        }
+    });
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeCreatePlanModal();
         }
     });
 </script>

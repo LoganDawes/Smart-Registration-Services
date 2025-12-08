@@ -1,49 +1,52 @@
 {% load static %}
 
 <!-- Load Plan Modal -->
-<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm" 
      id="load-plan-modal"
-     onclick="if(event.target === this) this.remove()">
-    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl">
-        <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-green-600">
-            <h2 class="text-2xl font-bold text-white">Load Plan to Registration Cart</h2>
-            <button onclick="document.getElementById('load-plan-modal').remove()" 
-                    class="text-white hover:text-gray-200 text-3xl font-bold">
+     onclick="if(event.target === this) closeLoadPlanModal()">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4 animate-fadeIn">
+        <div class="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-green-600 to-green-500 rounded-t-xl">
+            <h2 class="text-3xl font-bold text-white">Load Plan to Cart</h2>
+            <button onclick="closeLoadPlanModal()" 
+                    class="text-white hover:text-gray-200 text-4xl font-bold leading-none transition-colors">
                 &times;
             </button>
         </div>
         
-        <div class="p-6">
-            <p class="text-gray-700 mb-4">Select a plan to load all its courses into your registration cart:</p>
+        <div class="p-8">
+            <p class="text-gray-700 mb-6 text-lg">Select a plan to load all its courses into your registration cart:</p>
             
             {% if plans %}
-            <div class="space-y-2 max-h-96 overflow-y-auto">
+            <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
                 {% for plan in plans %}
-                <div class="p-4 border-2 {% if plan.status == 'APPROVED' %}border-green-500 bg-green-50{% else %}border-gray-300{% endif %} rounded-lg hover:border-green-500 hover:bg-green-50 cursor-pointer transition-colors"
+                <div class="p-6 border-2 {% if plan.status == 'APPROVED' %}border-green-500 bg-green-50{% else %}border-gray-300 bg-white{% endif %} rounded-xl hover:border-green-500 hover:shadow-md cursor-pointer transition-all"
                      onclick="loadPlanToCart({{ plan.id }})">
                     <div class="flex justify-between items-start">
                         <div class="flex-1">
-                            <h4 class="font-bold text-gray-800 text-lg">{{ plan.name }}</h4>
-                            <p class="text-sm text-gray-600 mt-1">{{ plan.term }} {{ plan.year }}</p>
-                            <p class="text-sm text-gray-600">{{ plan.planned_courses.count }} courses | Total Credits: {{ plan.total_credits }}</p>
+                            <h4 class="font-bold text-gray-800 text-xl">{{ plan.name }}</h4>
+                            <p class="text-gray-600 mt-2">{{ plan.term }} {{ plan.year }}</p>
+                            <p class="text-gray-600 mt-1">
+                                <span class="font-semibold">{{ plan.planned_courses.count }}</span> courses | 
+                                <span class="font-semibold">{{ plan.total_credits }}</span> credits
+                            </p>
                             
                             <!-- Show courses in plan -->
-                            <div class="mt-2 space-y-1">
+                            <div class="mt-3 space-y-1">
                                 {% for pc in plan.planned_courses.all|slice:":3" %}
-                                <p class="text-xs text-gray-500">
+                                <p class="text-sm text-gray-600">
                                     • {{ pc.section.course.course_code }} - {{ pc.section.course.title }}
                                 </p>
                                 {% endfor %}
                                 {% if plan.planned_courses.count > 3 %}
-                                <p class="text-xs text-gray-500">... and {{ plan.planned_courses.count|add:"-3" }} more</p>
+                                <p class="text-sm text-gray-500 font-semibold">+ {{ plan.planned_courses.count|add:"-3" }} more courses</p>
                                 {% endif %}
                             </div>
                         </div>
-                        <span class="inline-block px-3 py-1 text-xs font-semibold rounded-full ml-4
-                            {% if plan.status == 'DRAFT' %}bg-gray-100 text-gray-800
-                            {% elif plan.status == 'SUBMITTED' %}bg-blue-100 text-blue-800
-                            {% elif plan.status == 'APPROVED' %}bg-green-100 text-green-800
-                            {% elif plan.status == 'REJECTED' %}bg-red-100 text-red-800
+                        <span class="inline-block px-4 py-2 text-sm font-bold rounded-full ml-4
+                            {% if plan.status == 'DRAFT' %}bg-gray-200 text-gray-800
+                            {% elif plan.status == 'SUBMITTED' %}bg-blue-200 text-blue-800
+                            {% elif plan.status == 'APPROVED' %}bg-green-200 text-green-800
+                            {% elif plan.status == 'REJECTED' %}bg-red-200 text-red-800
                             {% endif %}">
                             {{ plan.get_status_display }}
                         </span>
@@ -52,27 +55,51 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="text-center py-8">
+            <div class="text-center py-12 bg-gray-50 rounded-lg">
                 <div class="text-6xl mb-4">📋</div>
-                <p class="text-gray-600 text-lg mb-4">You don't have any plans yet.</p>
+                <p class="text-gray-600 text-lg mb-6">You don't have any plans yet.</p>
                 <a href="{% url 'planning:schedule' %}" 
-                   class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold inline-block">
+                   class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold inline-block shadow-md hover:shadow-lg">
                     Create a Plan
                 </a>
             </div>
             {% endif %}
         </div>
         
-        <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
-            <button onclick="document.getElementById('load-plan-modal').remove()"
-                    class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+        <div class="sticky bottom-0 flex justify-end gap-4 p-6 border-t border-gray-200 bg-gray-50 rounded-b-xl">
+            <button onclick="closeLoadPlanModal()"
+                    class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
                 Cancel
             </button>
         </div>
     </div>
 </div>
 
+<style>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+    
+    .animate-fadeIn {
+        animation: fadeIn 0.2s ease-out;
+    }
+</style>
+
 <script>
+    function closeLoadPlanModal() {
+        const modal = document.getElementById('load-plan-modal');
+        if (modal) {
+            modal.remove();
+        }
+    }
+    
     function loadPlanToCart(planId) {
         fetch(`/registration/load-plan/${planId}/`, {
             method: 'POST',
@@ -85,7 +112,7 @@
         .then(data => {
             if (data.success) {
                 alert(`Loaded ${data.count} course(s) from plan to your registration cart!`);
-                document.getElementById('load-plan-modal').remove();
+                closeLoadPlanModal();
                 location.reload();
             } else {
                 alert(data.error || 'Failed to load plan');
@@ -110,4 +137,11 @@
         }
         return cookieValue;
     }
+    
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeLoadPlanModal();
+        }
+    });
 </script>

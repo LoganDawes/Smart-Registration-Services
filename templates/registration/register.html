@@ -15,35 +15,35 @@
     {% if user.is_student %}
     
     <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">Quick Actions</h2>
+    <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
         <div class="flex gap-4 flex-wrap">
             <a href="{% url 'courses:catalog' %}" 
-               class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                <span class="text-xl mr-2">📚</span> Browse Course Catalog
+               class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <span class="text-2xl mr-2">📚</span> Browse Course Catalog
             </a>
             <button 
                 onclick="loadPlanModal()"
-                class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
-                <span class="text-xl mr-2">📋</span> Load Plan
+                class="px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-700 hover:to-green-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <span class="text-2xl mr-2">📋</span> Load Plan
             </button>
             <a href="{% url 'planning:schedule' %}" 
-               class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">
-                <span class="text-xl mr-2">📅</span> View My Plans
+               class="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl hover:from-purple-700 hover:to-purple-600 transition-all font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <span class="text-2xl mr-2">📅</span> View My Schedule
             </a>
         </div>
     </div>
     
     <!-- Registration Cart -->
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
         <!-- Orange Header -->
-        <div class="bg-gradient-to-r from-orange-600 to-orange-500 p-6">
+        <div class="bg-gradient-to-r from-orange-600 to-orange-500 p-8">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-white">Registration Cart</h2>
+                <h2 class="text-3xl font-bold text-white">Registration Cart</h2>
                 <button 
                     onclick="confirmRegistration()"
                     id="confirm-btn"
-                    class="px-6 py-3 bg-white text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-semibold">
+                    class="px-8 py-4 bg-white text-orange-600 rounded-xl hover:bg-orange-50 transition-all font-bold text-lg shadow-md hover:shadow-lg">
                     Confirm Registration
                 </button>
             </div>
@@ -88,31 +88,31 @@
                     <!-- Action Buttons -->
                     <div class="flex gap-2 flex-shrink-0 ml-auto">
                         <button onclick="registerSingle({{ item.id }})"
-                                class="px-3 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors font-semibold text-sm">
+                                class="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg">
                             Register
                         </button>
                         <button onclick="removeFromCart({{ item.id }})"
-                                class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold text-sm">
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-sm shadow-md hover:shadow-lg">
                             Remove
                         </button>
                     </div>
                 </div>
                 {% endfor %}
             {% else %}
-            <div id="empty-cart" class="p-12 text-center">
-                <div class="text-6xl mb-4">🛒</div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">Your Cart is Empty</h3>
-                <p class="text-gray-600 text-lg mb-4">
+            <div id="empty-cart" class="p-16 text-center bg-gray-50">
+                <div class="text-7xl mb-6">🛒</div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-4">Your Cart is Empty</h3>
+                <p class="text-gray-600 text-xl mb-8">
                     Add courses from the catalog or load a plan to get started.
                 </p>
-                <div class="flex gap-4 justify-center">
+                <div class="flex gap-6 justify-center">
                     <a href="{% url 'courses:catalog' %}" 
-                       class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                       class="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-xl hover:from-blue-700 hover:to-blue-600 transition-all font-semibold shadow-md hover:shadow-lg">
                         Browse Catalog
                     </a>
                     <button 
                         onclick="loadPlanModal()"
-                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                        class="px-8 py-4 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl hover:from-green-700 hover:to-green-600 transition-all font-semibold shadow-md hover:shadow-lg">
                         Load Plan
                     </button>
                 </div>
@@ -123,11 +123,11 @@
     
     <!-- Currently Enrolled Courses -->
     {% if enrolled %}
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-        <div class="bg-gradient-to-r from-green-600 to-green-500 p-6">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-green-600 to-green-500 p-8">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold text-white">Currently Enrolled</h2>
-                <span class="text-lg font-semibold text-white">
+                <h2 class="text-3xl font-bold text-white">Currently Enrolled</h2>
+                <span class="text-xl font-bold text-white bg-white bg-opacity-20 px-6 py-3 rounded-xl">
                     Total Credits: {{ total_credits }}
                 </span>
             </div>
@@ -171,13 +171,9 @@
                 <!-- Action Button -->
                 <div class="flex-shrink-0 ml-auto">
                     <button 
-                        hx-post="/api/registration-actions/drop/"
-                        hx-vals='{"enrollment_id": {{ enrollment.id }}}'
-                        hx-confirm="Are you sure you want to drop {{ enrollment.section.course.course_code }}?"
-                        hx-target="closest div.flex"
-                        hx-swap="outerHTML swap:1s"
-                        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold text-sm">
-                        Drop
+                        onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')"
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md hover:shadow-lg">
+                        Drop Course
                     </button>
                 </div>
             </div>
@@ -188,9 +184,9 @@
     
     <!-- Waitlisted Courses -->
     {% if waitlisted %}
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-        <div class="bg-gradient-to-r from-yellow-600 to-yellow-500 p-6">
-            <h2 class="text-2xl font-bold text-white">Waitlisted Courses</h2>
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-yellow-600 to-yellow-500 p-8">
+            <h2 class="text-3xl font-bold text-white">Waitlisted Courses</h2>
         </div>
         
         <div class="overflow-x-auto">
@@ -231,12 +227,8 @@
                 <!-- Action Button -->
                 <div class="flex-shrink-0 ml-auto">
                     <button 
-                        hx-post="/api/registration-actions/drop/"
-                        hx-vals='{"enrollment_id": {{ enrollment.id }}}'
-                        hx-confirm="Are you sure you want to remove yourself from the waitlist?"
-                        hx-target="closest div.flex"
-                        hx-swap="outerHTML swap:1s"
-                        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold text-sm">
+                        onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')"
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold shadow-md hover:shadow-lg">
                         Remove
                     </button>
                 </div>
@@ -385,6 +377,34 @@
             }
         }
         return cookieValue;
+    }
+    
+    // Drop course functionality
+    function dropCourse(enrollmentId, courseCode) {
+        if (!confirm(`Are you sure you want to drop ${courseCode}? This action cannot be undone.`)) {
+            return;
+        }
+        
+        fetch('/api/registration-actions/drop/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ enrollment_id: enrollmentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Course dropped successfully!');
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to drop course');
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
     }
     
     // Handle HTMX events

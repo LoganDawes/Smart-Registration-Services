@@ -1,140 +1,75 @@
 {% extends "base.html" %}
 
-{% block title %}Schedule Planning - Smart Registration Services{% endblock %}
+{% block title %}My Schedule - Smart Registration Services{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <div class="hero-section rounded-lg shadow-lg p-8 mb-12">
-    <h1 class="text-5xl font-bold mb-4">Schedule Planning</h1>
+    <h1 class="text-5xl font-bold mb-4">My Weekly Schedule</h1>
     <p class="text-xl text-gray-600">
-        View your course schedule in weekly format. Manage your plans and see courses in their time blocks.
+        View your registered courses in a weekly calendar format.
     </p>
 </div>
 
 <div class="page-container">
     {% if user.is_student %}
     
-    <!-- Plan Selection Dropdown -->
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <div class="flex justify-between items-center">
-            <div class="flex-1">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Select Plan to View</label>
-                <select onchange="location.href='?plan_id=' + this.value"
-                        class="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-600">
-                    <option value="">-- Select a Plan --</option>
-                    {% for plan in plans %}
-                    <option value="{{ plan.id }}" {% if current_plan and current_plan.id == plan.id %}selected{% endif %}>
-                        {{ plan.name }} ({{ plan.term }} {{ plan.year }}) - {{ plan.get_status_display }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button 
-                hx-get="/planning/create-plan-form/"
-                hx-target="#modal-container"
-                hx-swap="innerHTML"
-                class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-                <span class="text-xl mr-2">+</span> New Plan
-            </button>
-        </div>
-    </div>
-    
-    {% if current_plan %}
-    <!-- Plan Actions -->
+    <!-- Summary Card -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">{{ current_plan.name }}</h2>
-                <p class="text-gray-600">{{ current_plan.term }} {{ current_plan.year }} | Total Credits: {{ total_credits }}</p>
+                <h2 class="text-2xl font-bold text-gray-800">Course Summary</h2>
+                <p class="text-gray-600 mt-2">Total Enrolled Courses: <span class="font-bold text-orange-600">{{ enrollments|length }}</span></p>
+                <p class="text-gray-600">Total Credits: <span class="font-bold text-orange-600">{{ total_credits }}</span></p>
             </div>
             <div class="flex gap-3">
-                {% if current_plan.status == 'DRAFT' %}
-                <a href="{% url 'courses:catalog' %}" 
-                   class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                    Add Courses
+                <a href="{% url 'registration:register' %}" 
+                   class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+                    View All Courses
                 </a>
-                <button 
-                    hx-post="/api/plans/{{ current_plan.id }}/detect_conflicts/"
-                    hx-trigger="click"
-                    hx-target="#conflicts-container"
-                    hx-swap="innerHTML"
-                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">
-                    Check Conflicts
-                </button>
-                <button 
-                    hx-post="/api/plans/{{ current_plan.id }}/submit/"
-                    hx-trigger="click"
-                    hx-confirm="Are you sure you want to submit this plan for advisor approval?"
-                    hx-target="#plan-status"
-                    hx-swap="innerHTML"
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
-                    Submit for Approval
-                </button>
-                {% endif %}
+                <a href="{% url 'courses:catalog' %}" 
+                   class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                    Browse Catalog
+                </a>
             </div>
-        </div>
-        
-        <!-- Conflicts Display -->
-        <div id="conflicts-container" class="mt-4">
-            {% if conflicts %}
-            <div class="bg-red-50 border-l-4 border-red-500 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">
-                            {{ conflicts|length }} Schedule Conflict{{ conflicts|length|pluralize }} Detected
-                        </h3>
-                        <div class="mt-2 text-sm text-red-700">
-                            {% for conflict in conflicts %}
-                            <p class="mt-2">
-                                <strong>{{ conflict.get_conflict_type_display }}:</strong> {{ conflict.description }}
-                            </p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
     
-    <!-- Weekly Schedule Graph -->
+    {% if enrollments %}
+    <!-- Weekly Schedule Calendar -->
     <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Weekly Schedule</h3>
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Weekly Schedule</h3>
         <div class="overflow-x-auto">
-            <div class="min-w-[800px]">
+            <div class="min-w-[900px]">
                 <!-- Days Header -->
                 <div class="grid grid-cols-8 gap-1 mb-2">
-                    <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100 rounded">Time</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Monday</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Tuesday</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Wednesday</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Thursday</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Friday</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Saturday</div>
-                    <div class="p-2 text-center font-semibold text-orange-700 bg-orange-50 rounded">Sunday</div>
+                    <div class="p-3 text-center font-bold text-gray-700 bg-gray-100 rounded-lg">Time</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Monday</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Tuesday</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Wednesday</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Thursday</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Friday</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Saturday</div>
+                    <div class="p-3 text-center font-bold text-orange-700 bg-orange-50 rounded-lg">Sunday</div>
                 </div>
                 
-                <!-- Time Blocks (8 AM - 8 PM) -->
-                {% for hour in time_slots %}
+                <!-- Time Blocks (7 AM - 10 PM) -->
+                {% for time_slot in time_slots %}
                 <div class="grid grid-cols-8 gap-1 mb-1">
                     <!-- Time Label -->
-                    <div class="p-2 text-center text-sm font-medium bg-gray-100 rounded">
-                        {{ hour.display }} {{ hour.period }}
+                    <div class="p-3 text-center text-sm font-semibold bg-gray-100 rounded-lg text-gray-700">
+                        {{ time_slot.display }} {{ time_slot.period }}
                     </div>
                     
                     <!-- Monday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.MON %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -142,13 +77,14 @@
                     </div>
                     
                     <!-- Tuesday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.TUE %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -156,13 +92,14 @@
                     </div>
                     
                     <!-- Wednesday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.WED %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -170,13 +107,14 @@
                     </div>
                     
                     <!-- Thursday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.THU %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -184,13 +122,14 @@
                     </div>
                     
                     <!-- Friday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.FRI %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -198,13 +137,14 @@
                     </div>
                     
                     <!-- Saturday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.SAT %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -212,13 +152,14 @@
                     </div>
                     
                     <!-- Sunday -->
-                    <div class="p-1 bg-gray-50 border border-gray-200 rounded min-h-[60px] relative">
+                    <div class="p-2 bg-gray-50 border-2 border-gray-200 rounded-lg min-h-[70px] relative hover:bg-blue-50 transition-colors">
                         {% if schedule_data %}
                             {% for course in schedule_data.schedule.SUN %}
-                                {% if course.start_time.hour == hour.hour %}
-                                <div class="bg-orange-500 text-white p-2 rounded text-xs font-semibold">
-                                    <div class="font-bold">{{ course.course_code }}</div>
-                                    <div class="text-[10px]">{{ course.location }}</div>
+                                {% if course.start_time.hour == time_slot.hour %}
+                                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-3 rounded-lg shadow-md">
+                                    <div class="font-bold text-sm">{{ course.course_code }}</div>
+                                    <div class="text-xs mt-1">{{ course.location }}</div>
+                                    <div class="text-xs opacity-90">{{ course.start_time|time:"g:i A" }}</div>
                                 </div>
                                 {% endif %}
                             {% endfor %}
@@ -230,84 +171,72 @@
         </div>
     </div>
     
-    <!-- Courses in Plan List -->
+    <!-- Detailed Course List -->
     <div class="bg-white rounded-lg shadow-lg p-6">
-        <h3 class="text-xl font-bold text-gray-800 mb-4">Courses in Plan</h3>
-        {% if current_plan.planned_courses.all %}
-        <div class="space-y-3">
-            {% for planned_course in current_plan.planned_courses.all %}
-            <div class="border border-gray-300 rounded-lg p-4 flex justify-between items-start hover:shadow-md transition-shadow">
-                <div class="flex-1">
-                    <h4 class="text-lg font-bold text-gray-800">
-                        {{ planned_course.section.course.course_code }} - {{ planned_course.section.course.title }}
-                    </h4>
-                    <p class="text-sm text-gray-600 mt-1">
-                        Section {{ planned_course.section.section_number }} |
-                        {{ planned_course.section.meeting_days }} 
-                        {{ planned_course.section.start_time|time:"g:i A" }} - 
-                        {{ planned_course.section.end_time|time:"g:i A" }} |
-                        {{ planned_course.section.location }}
-                    </p>
-                    <p class="text-sm text-gray-600">
-                        <strong>Instructor:</strong> 
-                        {% if planned_course.section.instructor %}
-                            {{ planned_course.section.instructor.get_full_name }}
-                        {% else %}
-                            TBA
-                        {% endif %}
-                        | <strong>Credits:</strong> {{ planned_course.section.course.credits }}
-                    </p>
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">Course Details</h3>
+        <div class="space-y-4">
+            {% for enrollment in enrollments %}
+            <div class="border-2 border-gray-200 rounded-lg p-5 hover:shadow-lg transition-shadow hover:border-orange-300">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h4 class="text-xl font-bold text-gray-800">
+                            {{ enrollment.section.course.course_code }} - {{ enrollment.section.course.title }}
+                        </h4>
+                        <p class="text-gray-600 mt-2">
+                            <span class="inline-block mr-4">
+                                <strong>Section:</strong> {{ enrollment.section.section_number }}
+                            </span>
+                            <span class="inline-block mr-4">
+                                <strong>Credits:</strong> {{ enrollment.section.course.credits }}
+                            </span>
+                            <span class="inline-block">
+                                <strong>CRN:</strong> {{ enrollment.section.crn|default_if_none:"N/A"|default:"N/A" }}
+                            </span>
+                        </p>
+                        <p class="text-gray-600 mt-1">
+                            <strong>Schedule:</strong> 
+                            {{ enrollment.section.meeting_days }} 
+                            {{ enrollment.section.start_time|time:"g:i A" }} - 
+                            {{ enrollment.section.end_time|time:"g:i A" }}
+                        </p>
+                        <p class="text-gray-600 mt-1">
+                            <strong>Location:</strong> {{ enrollment.section.location }}
+                            {% if enrollment.section.campus %}
+                                ({{ enrollment.section.campus }})
+                            {% endif %}
+                        </p>
+                        <p class="text-gray-600 mt-1">
+                            <strong>Instructor:</strong> 
+                            {% if enrollment.section.instructor %}
+                                {{ enrollment.section.instructor.get_full_name }}
+                            {% else %}
+                                TBA
+                            {% endif %}
+                        </p>
+                    </div>
+                    <button 
+                        onclick="dropCourse({{ enrollment.id }}, '{{ enrollment.section.course.course_code }}')"
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold ml-4">
+                        Drop Course
+                    </button>
                 </div>
-                {% if current_plan.status == 'DRAFT' %}
-                <button 
-                    hx-post="/api/plans/{{ current_plan.id }}/remove_course/"
-                    hx-vals='{"planned_course_id": {{ planned_course.id }}}'
-                    hx-confirm="Are you sure you want to remove this course?"
-                    hx-target="closest div.border"
-                    hx-swap="outerHTML swap:1s"
-                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold ml-4">
-                    Remove
-                </button>
-                {% endif %}
             </div>
             {% endfor %}
         </div>
-        {% else %}
-        <p class="text-gray-600 text-center py-8">
-            No courses in this plan yet. <a href="{% url 'courses:catalog' %}" class="text-orange-600 hover:text-orange-700 font-semibold">Browse course catalog</a> to add courses.
-        </p>
-        {% endif %}
     </div>
-    
-    <!-- Advisor Comments -->
-    {% if current_plan.advisor_comments %}
-    <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-        <h3 class="text-lg font-bold text-blue-800 mb-2">Advisor Comments</h3>
-        <p class="text-blue-700">{{ current_plan.advisor_comments }}</p>
-    </div>
-    {% endif %}
     
     {% else %}
-    <!-- No Plan Selected -->
+    <!-- No Enrollments -->
     <div class="bg-white rounded-lg shadow-lg p-12 text-center">
         <div class="text-6xl mb-4">📅</div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-2">No Plan Selected</h3>
-        <p class="text-gray-600 text-lg mb-4">
-            {% if plans %}
-                Select a plan from the dropdown above to view your schedule.
-            {% else %}
-                You don't have any plans yet. Create one to get started!
-            {% endif %}
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No Enrolled Courses</h3>
+        <p class="text-gray-600 text-lg mb-6">
+            You haven't registered for any courses yet. Browse the course catalog to get started!
         </p>
-        {% if not plans %}
-        <button 
-            hx-get="/planning/create-plan-form/"
-            hx-target="#modal-container"
-            hx-swap="innerHTML"
-            class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-            Create Your First Plan
-        </button>
-        {% endif %}
+        <a href="{% url 'courses:catalog' %}" 
+           class="inline-block px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
+            Browse Course Catalog
+        </a>
     </div>
     {% endif %}
     
@@ -315,7 +244,7 @@
     <!-- Non-student view -->
     <div class="bg-white rounded-lg shadow-lg p-12 text-center">
         <div class="text-6xl mb-4">📅</div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-2">Schedule Planning</h3>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">My Schedule</h3>
         <p class="text-gray-600 text-lg">
             This feature is available for students only.
         </p>
@@ -323,19 +252,51 @@
     {% endif %}
 </div>
 
-<!-- Modal Container -->
-<div id="modal-container"></div>
-
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-    // Handle HTMX events for better UX
-    document.body.addEventListener('htmx:afterSwap', function(event) {
-        // Reload page after successful operations
-        if (event.detail.target.id === 'plan-status') {
-            setTimeout(() => location.reload(), 1000);
+    // Drop course functionality
+    function dropCourse(enrollmentId, courseCode) {
+        if (!confirm(`Are you sure you want to drop ${courseCode}? This action cannot be undone.`)) {
+            return;
         }
-    });
+        
+        fetch('/api/registration-actions/drop/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ enrollment_id: enrollmentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert('Course dropped successfully!');
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to drop course');
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 </script>
 {% endblock %}

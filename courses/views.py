@@ -5,6 +5,8 @@ from django.db import models as django_models
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from django.views.generic import TemplateView
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .models import Course, CourseSection
 from .serializers import CourseSerializer, CourseSectionSerializer
 
@@ -37,6 +39,19 @@ class CourseListView(TemplateView):
 
 
 course_catalog = CourseListView.as_view()
+
+
+@login_required
+def course_details_modal(request, section_id):
+    """View to show course details in a modal."""
+    section = get_object_or_404(
+        CourseSection.objects.select_related('course', 'instructor').prefetch_related('course__prerequisites'),
+        id=section_id
+    )
+    
+    return render(request, 'courses/course_details_modal.html', {
+        'section': section
+    })
 
 
 class CourseViewSet(viewsets.ReadOnlyModelViewSet):
