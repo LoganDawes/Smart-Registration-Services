@@ -20,67 +20,80 @@ from courses.models import CourseSection
 
 @method_decorator(login_required, name='dispatch')
 class SchedulePlanningView(TemplateView):
-    """Schedule Planning page view."""
+    """Schedule page view - displays registered courses in calendar format."""
     template_name = 'planning/schedule.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get student's plans
+        # Get student's enrolled courses only (not plans)
         if self.request.user.is_student():
-            plans = StudentPlan.objects.filter(
-                student=self.request.user
-            ).prefetch_related('planned_courses__section__course').order_by('-created_at')
+            from registration.models import Enrollment
+            from .utils import parse_meeting_days
             
-            # Add credits to each plan
-            plans_with_credits = []
-            for plan in plans:
-                plan.total_credits = sum(
-                    pc.section.course.credits
-                    for pc in plan.planned_courses.select_related('section__course').all()
-                )
-                plans_with_credits.append(plan)
+            # Get all enrolled courses for the student
+            enrollments = Enrollment.objects.filter(
+                student=self.request.user,
+                status=Enrollment.Status.ENROLLED
+            ).select_related('section__course', 'section__instructor').order_by('section__start_time')
             
-            context['plans'] = plans_with_credits
+            context['enrollments'] = enrollments
             
-            # Get current plan (from query param or most recent)
-            plan_id = self.request.GET.get('plan_id')
-            if plan_id:
-                current_plan = plans.filter(id=plan_id).first()
-            else:
-                current_plan = plans.first()
+            # Calculate total credits
+            total_credits = sum(e.section.course.credits for e in enrollments)
+            context['total_credits'] = total_credits
             
-            if current_plan:
-                context['current_plan'] = current_plan
-                context['schedule_data'] = get_schedule_grid_data(current_plan)
-                context['conflicts'] = current_plan.conflicts.all()
+            # Generate schedule grid data for calendar view
+            days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+            schedule = {day: [] for day in days}
+            
+            for enrollment in enrollments:
+                section = enrollment.section
+                meeting_days = parse_meeting_days(section.meeting_days)
                 
-                # Use already calculated total credits if available
-                context['total_credits'] = getattr(current_plan, 'total_credits', sum(
-                    pc.section.course.credits
-                    for pc in current_plan.planned_courses.select_related('section__course').all()
-                ))
+                for day in meeting_days:
+                    if day in schedule:
+                        schedule[day].append({
+                            'course_code': section.course.course_code,
+                            'course_title': section.course.title,
+                            'section_number': section.section_number,
+                            'start_time': section.start_time,
+                            'end_time': section.end_time,
+                            'location': section.location,
+                            'instructor': section.instructor.get_full_name() if section.instructor else 'TBA',
+                            'credits': section.course.credits,
+                            'enrollment_id': enrollment.id
+                        })
+            
+            # Sort courses by start time for each day
+            for day in days:
+                schedule[day].sort(key=lambda x: x['start_time'])
+            
+            context['schedule_data'] = {
+                'days': days,
+                'schedule': schedule
+            }
+            
+            # Create time slots for schedule grid (7 AM to 10 PM)
+            time_slots = []
+            for hour in range(7, 22):
+                # Proper 12-hour format conversion
+                if hour < 12:
+                    display_hour = hour if hour > 0 else 12
+                    period = 'AM'
+                elif hour == 12:
+                    display_hour = 12
+                    period = 'PM'
+                else:
+                    display_hour = hour - 12
+                    period = 'PM'
                 
-                # Create time slots for schedule grid (8 AM to 10 PM)
-                time_slots = []
-                for hour in range(8, 22):
-                    # Proper 12-hour format conversion
-                    if hour < 12:
-                        display_hour = hour
-                        period = 'AM'
-                    elif hour == 12:
-                        display_hour = 12
-                        period = 'PM'
-                    else:
-                        display_hour = hour - 12
-                        period = 'PM'
-                    
-                    time_slots.append({
-                        'hour': hour,
-                        'display': f"{display_hour}:00",
-                        'period': period
-                    })
-                context['time_slots'] = time_slots
+                time_slots.append({
+                    'hour': hour,
+                    'display': f"{display_hour}:00",
+                    'period': period
+                })
+            context['time_slots'] = time_slots
         
         return context
 
