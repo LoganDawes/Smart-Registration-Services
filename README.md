@@ -2,7 +2,7 @@
 
 A comprehensive university course-planning and registration system built with Django, designed to support students, advisors, and registrar staff through an integrated, modular architecture.
 
-## 🎯 Overview
+## Overview
 
 Smart Registration Services is a modern web application that streamlines the course registration process at universities. The system provides:
 
@@ -10,7 +10,7 @@ Smart Registration Services is a modern web application that streamlines the cou
 - **Advisors**: Student plan review, real-time chat, approval workflows, and collaboration tools
 - **Registrar**: Course management, enrollment tracking, and system administration
 
-## 🏗️ Architecture
+## Architecture
 
 The system is built as eight independent but integrated modules:
 
@@ -60,25 +60,26 @@ The system is built as eight independent but integrated modules:
 - Error handling and security
 - Registrar data import pipelines
 
-## 🚀 Technology Stack
+## Technology Stack
 
 - **Backend**: Django 4.2+ with Django REST Framework
 - **Database**: PostgreSQL (with SQLite fallback for development)
 - **Real-Time**: Django Channels + Redis (WebSockets)
 - **Background Tasks**: Celery + Redis
-- **Frontend**: Django Templates + HTMX + Tailwind CSS
-- **Authentication**: django-cas-ng
+- **Frontend**: Django Templates + HTMX + Custom CSS
+- **Authentication**: django-cas-ng (CAS integration)
 - **API Documentation**: drf-spectacular (Swagger/ReDoc)
+- **Testing**: Cypress for E2E testing
 - **Containerization**: Docker + Docker Compose
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Python 3.11+
 - PostgreSQL 15+ (or SQLite for development)
 - Redis 7+
 - Docker & Docker Compose (optional but recommended)
 
-## 🔧 Installation & Setup
+## Installation & Setup
 
 ### Option 1: Using Docker (Recommended)
 
@@ -160,7 +161,7 @@ celery -A smart_registration worker -l info
 celery -A smart_registration beat -l info
 ```
 
-## 🗄️ Database Models
+## Database Models
 
 ### Authentication Models
 - **User**: Custom user model with role-based permissions (Student, Advisor, Registrar)
@@ -197,7 +198,7 @@ celery -A smart_registration beat -l info
 - **SystemLog**: System-wide logging
 - **APIMetrics**: API performance tracking
 
-## 🔑 API Endpoints
+## API Endpoints
 
 ### Course Catalog
 - `GET /api/courses/` - List all courses
@@ -215,7 +216,7 @@ celery -A smart_registration beat -l info
 - `GET /api/redoc/` - ReDoc documentation
 - `GET /api/schema/` - OpenAPI schema
 
-## 🔐 Security Features
+## Security Features
 
 - CAS authentication integration
 - Role-based access control
@@ -226,7 +227,7 @@ celery -A smart_registration beat -l info
 - SQL injection prevention (Django ORM)
 - Input validation and sanitization
 
-## 📊 Admin Interface
+## Admin Interface
 
 The Django admin interface provides comprehensive management tools:
 
@@ -238,9 +239,20 @@ The Django admin interface provides comprehensive management tools:
 
 Access at: http://localhost:8000/admin/
 
-## 🧪 Testing
+## Testing
+
+The project includes comprehensive end-to-end testing using Cypress.
 
 Run tests with:
+```bash
+# Run Cypress in interactive mode
+npm run cypress:open
+
+# Run Cypress headless
+npm run cypress:run
+```
+
+Django unit tests:
 ```bash
 python manage.py test
 ```
@@ -250,7 +262,7 @@ Run with coverage:
 pytest --cov=. --cov-report=html
 ```
 
-## 📈 Monitoring & Logging
+## Monitoring & Logging
 
 Logs are stored in the `logs/` directory:
 - `django.log` - Application logs
@@ -261,7 +273,7 @@ Database logging tracks:
 - Registration actions
 - User activities
 
-## 🚢 Deployment
+## Deployment
 
 ### Production Checklist
 
@@ -287,7 +299,7 @@ Key environment variables (see `.env.example` for complete list):
 - `CAS_SERVER_URL` - CAS authentication server
 - `EMAIL_HOST`, `EMAIL_PORT` - Email configuration
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -295,56 +307,57 @@ Key environment variables (see `.env.example` for complete list):
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
-## 👥 Team
+## Team
 
 Smart Registration Services Team
 
-## 📧 Support
+## Support
 
 For support, please open an issue on the GitHub repository.
 
-## 🗺️ Roadmap
+## Roadmap
 
 ### Phase 1: Core Infrastructure (Completed)
-- ✅ Project setup and configuration
-- ✅ Database models and migrations
-- ✅ Authentication and user management
-- ✅ Basic API endpoints
+- [x] Project setup and configuration
+- [x] Database models and migrations
+- [x] Authentication and user management
+- [x] Basic API endpoints
 
-### Phase 2: Course Management (In Progress)
-- ✅ Course catalog API
-- ⏳ Course search and filtering
-- ⏳ Section management
-- ⏳ Prerequisites handling
+### Phase 2: Course Management (Completed)
+- [x] Course catalog API
+- [x] Course search and filtering
+- [x] Section management
+- [x] Prerequisites handling
 
-### Phase 3: Planning & Registration
-- ⏳ Schedule builder interface
-- ⏳ Conflict detection
-- ⏳ Registration workflows
-- ⏳ Advisor approval system
+### Phase 3: Planning & Registration (Completed)
+- [x] Schedule builder interface
+- [x] Conflict detection
+- [x] Registration workflows
+- [x] Advisor approval system
 
-### Phase 4: Collaboration & Communication
-- ⏳ WebSocket chat implementation
-- ⏳ Advisor dashboard
-- ⏳ Plan review interface
-- ⏳ Notification system
+### Phase 4: Collaboration & Communication (Completed)
+- [x] WebSocket chat implementation
+- [x] Advisor dashboard
+- [x] Plan review interface
+- [x] Notification system
 
-### Phase 5: AI & Recommendations
-- ⏳ Recommendation engine
-- ⏳ Degree planning
-- ⏳ Learning from feedback
+### Phase 5: AI & Recommendations (Completed)
+- [x] AI-powered course recommendation system
+- [x] Degree requirement tracking and validation
+- [x] Student feedback and learning system
 
-### Phase 6: Production Readiness
-- ⏳ Performance optimization
-- ⏳ Security hardening
-- ⏳ Comprehensive testing
-- ⏳ Documentation completion
+### Phase 6: Production Readiness (In Progress)
+- [x] Performance optimization
+- [x] Security hardening
+- [x] E2E testing with Cypress
+- [x] Core documentation (README, API docs, deployment guide)
+- [ ] Additional user guides and tutorials
 
-## 🔗 Related Documentation
+## Related Documentation
 
 - [Django Documentation](https://docs.djangoproject.com/)
 - [Django REST Framework](https://www.django-rest-framework.org/)
