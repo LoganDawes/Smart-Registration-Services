@@ -1,28 +1,31 @@
 {% load static %}
 
 <!-- Course Details Modal -->
-<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm" 
+<div class="modal-overlay" 
      id="course-details-modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="course-modal-title"
      onclick="if(event.target === this) closeCourseDetailsModal()">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto m-4 animate-fadeIn">
+    <div class="modal-container">
         <!-- Header -->
-        <div class="sticky top-0 bg-gradient-to-r from-orange-600 to-orange-500 p-6 rounded-t-xl">
-            <div class="flex justify-between items-start">
-                <div class="flex-1">
-                    <h2 class="text-3xl font-bold text-white mb-2">{{ section.course.course_code }}</h2>
-                    <p class="text-xl text-white opacity-90">{{ section.course.title }}</p>
-                </div>
-                <button onclick="closeCourseDetailsModal()" 
-                        class="text-white hover:text-gray-200 text-4xl font-bold leading-none transition-colors">
-                    &times;
-                </button>
+        <div class="modal-header">
+            <div class="flex-1">
+                <h2 id="course-modal-title" class="modal-header-title">{{ section.course.course_code }}</h2>
+                <p class="modal-header-subtitle">{{ section.course.title }}</p>
             </div>
+            <button onclick="closeCourseDetailsModal()" 
+                    class="modal-close-btn"
+                    aria-label="Close modal"
+                    type="button">
+                &times;
+            </button>
         </div>
         
         <!-- Body -->
-        <div class="p-8 space-y-6">
+        <div class="modal-body">
             <!-- Section Info -->
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4 mb-6">
                 <div class="bg-orange-50 p-4 rounded-lg">
                     <p class="text-sm text-gray-600 font-semibold">Section</p>
                     <p class="text-2xl font-bold text-orange-600">{{ section.section_number }}</p>
@@ -42,13 +45,13 @@
             </div>
             
             <!-- Description -->
-            <div class="border-l-4 border-orange-500 pl-4">
+            <div class="border-l-4 border-orange-500 pl-4 mb-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Course Description</h3>
                 <p class="text-gray-700 leading-relaxed">{{ section.course.description }}</p>
             </div>
             
             <!-- Schedule Details -->
-            <div class="bg-gray-50 p-6 rounded-lg">
+            <div class="bg-gray-50 p-6 rounded-lg mb-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">Schedule Information</h3>
                 <div class="space-y-3">
                     <div class="flex items-start">
@@ -101,7 +104,7 @@
             </div>
             
             <!-- Enrollment Info -->
-            <div class="bg-blue-50 p-6 rounded-lg">
+            <div class="bg-blue-50 p-6 rounded-lg mb-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-3">Enrollment Status</h3>
                 <div class="flex items-center justify-between">
                     <div>
@@ -126,7 +129,7 @@
             
             <!-- Prerequisites -->
             {% if section.course.prerequisites.all %}
-            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mb-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Prerequisites</h3>
                 <ul class="list-disc list-inside space-y-1">
                     {% for prereq in section.course.prerequisites.all %}
@@ -146,7 +149,7 @@
         </div>
         
         <!-- Footer Actions -->
-        <div class="sticky bottom-0 bg-gray-50 p-6 rounded-b-xl border-t border-gray-200 flex justify-end gap-4">
+        <div class="modal-footer">
             <button onclick="closeCourseDetailsModal()"
                     class="px-8 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
                 Close
@@ -163,26 +166,44 @@
     </div>
 </div>
 
-<style>
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
+<script>
+    // Store the element that opened the modal for focus restoration
+    let modalOpenerElement = null;
+    
+    // Set opener when modal is opened (call this from the opener)
+    if (!window.courseDetailsModalOpened) {
+        window.courseDetailsModalOpened = true;
+        modalOpenerElement = document.activeElement;
+        
+        // Lock body scroll
+        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+        document.body.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
+        document.body.classList.add('modal-open');
+        
+        // Focus on close button for accessibility
+        setTimeout(() => {
+            const closeBtn = document.querySelector('#course-details-modal .modal-close-btn');
+            if (closeBtn) closeBtn.focus();
+        }, 100);
     }
     
-    .animate-fadeIn {
-        animation: fadeIn 0.2s ease-out;
-    }
-</style>
-
-<script>
     function closeCourseDetailsModal() {
-        document.getElementById('course-details-modal').remove();
+        // Unlock body scroll
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('--scrollbar-width');
+        
+        // Remove modal
+        const modal = document.getElementById('course-details-modal');
+        if (modal) {
+            modal.remove();
+        }
+        
+        // Restore focus to opener
+        if (modalOpenerElement && modalOpenerElement.focus) {
+            modalOpenerElement.focus();
+        }
+        
+        window.courseDetailsModalOpened = false;
     }
     
     function addToPlan(sectionId) {
@@ -242,6 +263,28 @@
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeCourseDetailsModal();
+        }
+    });
+    
+    // Trap focus within modal
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Tab') {
+            const modal = document.getElementById('course-details-modal');
+            if (!modal) return;
+            
+            const focusableElements = modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            
+            if (event.shiftKey && document.activeElement === firstElement) {
+                event.preventDefault();
+                lastElement.focus();
+            } else if (!event.shiftKey && document.activeElement === lastElement) {
+                event.preventDefault();
+                firstElement.focus();
+            }
         }
     });
 </script>
