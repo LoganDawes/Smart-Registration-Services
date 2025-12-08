@@ -11,7 +11,7 @@ from .serializers import CourseSerializer, CourseSectionSerializer
 
 class CourseListView(TemplateView):
     """Course Catalog page view."""
-    template_name = 'courses/catalog_new.html'
+    template_name = 'courses/catalog.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

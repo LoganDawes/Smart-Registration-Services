@@ -21,7 +21,7 @@ from courses.models import CourseSection
 @method_decorator(login_required, name='dispatch')
 class SchedulePlanningView(TemplateView):
     """Schedule Planning page view."""
-    template_name = 'planning/schedule_new.html'
+    template_name = 'planning/schedule.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
