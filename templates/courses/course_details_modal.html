@@ -236,7 +236,8 @@
                 if (btn) {
                     btn.disabled = true;
                     btn.classList.add('opacity-50', 'cursor-not-allowed');
-                    btn.innerHTML = '<span class="mr-2">✓</span> Added to Added Courses';
+                    // Safer way to update button content
+                    btn.textContent = '✓ Added to Added Courses';
                 }
                 
                 // Update badge count if exists
