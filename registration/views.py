@@ -381,7 +381,7 @@ class RegistrationActionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def drop(self, request):
         """Drop an enrollment."""
-        if not request.user.is_student():
+        if not request.user.is_student() and not request.user.is_staff:
             return Response(
                 {'error': 'Only students can drop enrollments'},
                 status=status.HTTP_403_FORBIDDEN
@@ -392,21 +392,36 @@ class RegistrationActionViewSet(viewsets.ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         enrollment_id = serializer.validated_data['enrollment_id']
-        enrollment = get_object_or_404(
-            Enrollment,
-            id=enrollment_id,
-            student=request.user
-        )
+        
+        # Allow admin to drop any enrollment, students only their own
+        if request.user.is_student():
+            enrollment = get_object_or_404(
+                Enrollment,
+                id=enrollment_id,
+                student=request.user
+            )
+        else:
+            enrollment = get_object_or_404(Enrollment, id=enrollment_id)
+        
+        # Check if already dropped
+        if enrollment.status == Enrollment.Status.DROPPED:
+            return Response(
+                {'error': 'This enrollment has already been dropped'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         with transaction.atomic():
+            # Update enrollment status
+            old_status = enrollment.status
             enrollment.status = Enrollment.Status.DROPPED
             enrollment.dropped_at = timezone.now()
             enrollment.save()
             
-            # Update section enrollment count
-            if enrollment.section.current_enrollment > 0:
-                enrollment.section.current_enrollment -= 1
-                enrollment.section.save()
+            # Update section enrollment count only if was enrolled (not waitlisted)
+            if old_status == Enrollment.Status.ENROLLED:
+                if enrollment.section.current_enrollment > 0:
+                    enrollment.section.current_enrollment -= 1
+                    enrollment.section.save()
             
             # Log the action
             RegistrationLog.objects.create(
@@ -417,7 +432,8 @@ class RegistrationActionViewSet(viewsets.ViewSet):
                     'course_code': enrollment.section.course.course_code,
                     'section': enrollment.section.section_number,
                     'term': enrollment.section.term,
-                    'year': enrollment.section.year
+                    'year': enrollment.section.year,
+                    'previous_status': old_status
                 }
             )
         
