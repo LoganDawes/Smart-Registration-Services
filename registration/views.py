@@ -313,7 +313,9 @@ class RegistrationActionViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # REMOVED: Prerequisite validation - users can register for any course
+        # REMOVED: Prerequisite validation per institutional policy change
+        # Students may now register for any course regardless of prerequisite completion
+        # This allows flexible enrollment paths and student autonomy in course selection
         # # Check prerequisites
         # prereqs_met, missing = check_prerequisites(request.user, section.course)
         # if not prereqs_met:
@@ -476,7 +478,8 @@ class RegistrationActionViewSet(viewsets.ViewSet):
         ).exists():
             issues.append('Already enrolled in this section')
         
-        # REMOVED: Prerequisite validation - users can register for any course
+        # REMOVED: Prerequisite validation per institutional policy change
+        # Students may now register for any course regardless of prerequisite completion
         # # Check prerequisites
         # prereqs_met, missing = check_prerequisites(request.user, section.course)
         # if not prereqs_met:
@@ -670,7 +673,8 @@ def confirm_all_registration(request):
                 })
                 continue
             
-            # REMOVED: Prerequisite validation - users can register for any course
+            # REMOVED: Prerequisite validation per institutional policy change
+            # Students may now register for any course regardless of prerequisite completion
             # # Check prerequisites
             # prereqs_met, missing = check_prerequisites(request.user, section.course)
             # if not prereqs_met:

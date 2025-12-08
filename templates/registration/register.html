@@ -366,7 +366,8 @@
                         location.reload();
                     })
                     .catch(() => {
-                        alert('Successfully registered!');
+                        // Registration succeeded but removal failed - still show success and reload
+                        alert('Registration successful! Please refresh the page to see updated courses.');
                         location.reload();
                     });
                 } else {
