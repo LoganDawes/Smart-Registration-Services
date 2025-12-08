@@ -79,7 +79,7 @@ class SchedulePlanningView(TemplateView):
             for hour in range(7, 22):
                 # Proper 12-hour format conversion
                 if hour < 12:
-                    display_hour = hour if hour > 0 else 12
+                    display_hour = hour
                     period = 'AM'
                 elif hour == 12:
                     display_hour = 12

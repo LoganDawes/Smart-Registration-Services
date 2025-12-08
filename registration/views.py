@@ -381,9 +381,9 @@ class RegistrationActionViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
     def drop(self, request):
         """Drop an enrollment."""
-        if not request.user.is_student() and not request.user.is_staff:
+        if not request.user.is_student() and not (request.user.is_staff and request.user.is_superuser):
             return Response(
-                {'error': 'Only students can drop enrollments'},
+                {'error': 'Only students or superuser staff can drop enrollments'},
                 status=status.HTTP_403_FORBIDDEN
             )
         

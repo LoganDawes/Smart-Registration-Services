@@ -190,7 +190,7 @@
                                 <strong>Credits:</strong> {{ enrollment.section.course.credits }}
                             </span>
                             <span class="inline-block">
-                                <strong>CRN:</strong> {{ enrollment.section.crn|default:"N/A" }}
+                                <strong>CRN:</strong> {{ enrollment.section.crn|default_if_none:"N/A"|default:"N/A" }}
                             </span>
                         </p>
                         <p class="text-gray-600 mt-1">

@@ -289,43 +289,6 @@
                 alert('Error loading course details: ' + error.message);
             });
     }
-                            </div>
-                        </div>
-                        ` : ''}
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700">Restrictions</label>
-                            <p class="text-gray-800">${section.restrictions}</p>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700">Attributes</label>
-                            <p class="text-gray-800">${section.attributes}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="flex justify-end gap-3 p-6 border-t border-gray-200">
-                        <button onclick="document.getElementById('details-modal').remove()"
-                                class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
-                            Close
-                        </button>
-                        <button onclick="addToPlan(${sectionId}); document.getElementById('details-modal').remove();"
-                                class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
-                            Add to Plan
-                        </button>
-                        {% if user.is_student %}
-                        <button onclick="registerCourse(${sectionId}); document.getElementById('details-modal').remove();"
-                                class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-semibold">
-                            Register
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('modal-container').innerHTML = modal;
-    }
     
     // Add to plan - show plan selector
     function addToPlan(sectionId) {
